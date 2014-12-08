@@ -1,8 +1,15 @@
 #include <iostream>
+#include "include/game.h"
 
 using namespace std;
 
 int main() {
-    cout << "Hello, World!" << endl;
+    srand(time(0));
+
+    Game g;
+    g.loop();
+
+    cout << "Crash experienced is the fault of SFML, sorry" << endl;
+
     return 0;
 }
