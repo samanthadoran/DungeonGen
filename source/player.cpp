@@ -1,10 +1,10 @@
 #include "../include/player.h"
 
-Player::Player(int x, int y, int terminalVelocity) : Entity(x, y) {
+Player::Player(int x, int y, int terminalVelocity) : Actor(x, y) {
     this->terminalVelocity = terminalVelocity;
 }
 
-Player::Player(sf::Vector2f pos, int terminalVelocity) : Entity(pos) {
+Player::Player(sf::Vector2f pos, int terminalVelocity) : Actor(pos) {
     this->terminalVelocity = terminalVelocity;
 }
 

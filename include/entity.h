@@ -12,7 +12,7 @@
 class Entity {
 public:
 
-    virtual void control() = 0;
+    //virtual void control() = 0;
 
     virtual std::string toString() const = 0;
 
@@ -28,6 +28,8 @@ public:
 
     void setPosition(sf::Vector2i);
 
+    unsigned int getUUID() const;
+
     sf::Sprite getSprite() const;
 
     sf::RectangleShape getCollisionAABB() const;
@@ -36,6 +38,7 @@ public:
 
     void setVelocity(sf::Vector2f);
 
+    /*
     double getHP() const;
 
     void setHP(double);
@@ -43,17 +46,18 @@ public:
     double getDamage() const;
 
     //Returns change in HP of this argument
-    double attack(Entity *);
+    double attack(Entity *);*/
 
     virtual ~Entity();
 
 protected:
 private:
-    double damage;
-    double hp;
-
-    std::vector<Item> items;
-    std::vector<Equipment> equipment;
+    //double damage;
+    //double hp;
+    unsigned int UUID;
+    static int nextUUID;
+    //std::vector<Item> items;
+    //std::vector<Equipment> equipment;
 
     sf::Vector2f position;
     sf::Vector2f velocity;

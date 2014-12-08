@@ -3,9 +3,9 @@
 
 #include <random>
 #include <time.h>
-#include "entity.h"
+#include "actor.h"
 
-class NPC : public Entity {
+class NPC : public Actor {
 public:
     NPC(int, int);
 

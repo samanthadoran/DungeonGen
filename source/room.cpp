@@ -53,7 +53,7 @@ int Room::getLength() const {
 }
 
 bool Room::hasDoors() const {
-    return doors.size();
+    return !doors.empty();
 }
 
 sf::Vector2i Room::popDoor() {

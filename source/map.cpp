@@ -292,7 +292,6 @@ void Map::generateMap() {
 
         //Make a corridor between u & v
         addPath(generatePath(u, v));
-
     }
     while (true);
 

@@ -1,11 +1,11 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "entity.h"
+#include "actor.h"
 
 using std::vector;
 
-class Player : public Entity {
+class Player : public Actor {
 public:
     Player(int, int, int);
 

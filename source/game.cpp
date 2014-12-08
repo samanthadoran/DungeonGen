@@ -13,7 +13,7 @@ Game::Game() {
     music.setLoop(true);
 
     //Creating our window
-    app.create(sf::VideoMode(1440, 900), "ASDF");
+    app.create(sf::VideoMode(1440, 900), "Dungeon Generator");
 
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
@@ -60,7 +60,7 @@ void Game::runEvents() {
         if (event.type == sf::Event::LostFocus)
             focus = false;
 
-        // Close window : exit
+        // Close window: exit
         if (event.type == sf::Event::Closed)
             app.close();
 
@@ -76,66 +76,19 @@ sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const
     future.left += movement.x * elapsed.asSeconds();
 
     for (auto row: d.getFloor(floor).getMap())
-        for (
-            auto tile:
-                row)
-            if (tile->
-
-                    getTileType()
-
-                    == TileType::WALL) if (tile->
-
-                            getGraphicalRepresentation()
-
-                    .
-
-                            getGlobalBounds()
-
-                    .
-                            intersects(future)
-                    )
-                movement.
-                        x = 0;
+        for (auto tile: row)
+            if (tile->getTileType() == TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
+                movement.x = 0;
 
     future = test;
-    future.top += movement.
-            y * elapsed
-            .
+    future.top += movement.y * elapsed.asSeconds();
 
-                    asSeconds();
+    for (auto row: d.getFloor(floor).getMap())
+        for (auto tile: row)
+            if (tile->getTileType() == TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
+                movement.y = 0;
 
-    for (
-        auto row:
-            d.
-                            getFloor(floor)
-                    .
-
-                            getMap()
-
-            )
-        for (
-            auto tile:
-                row)
-            if (tile->
-
-                    getTileType()
-
-                    == TileType::WALL) if (tile->
-
-                            getGraphicalRepresentation()
-
-                    .
-
-                            getGlobalBounds()
-
-                    .
-                            intersects(future)
-                    )
-                movement.
-                        y = 0;
-
-    return
-            movement;
+    return movement;
 }
 
 void Game::runTileEvent(Player *p) {
@@ -171,7 +124,9 @@ void Game::loop() {
     Player player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160);
     NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
     entities.push_back(&player);
+    actors.push_back(&player);
     entities.push_back(&testnpc);
+    actors.push_back(&testnpc);
 
 
     sf::Clock textclk;
@@ -191,7 +146,7 @@ void Game::loop() {
         //Check for application events.
         runEvents();
 
-        for (auto e: entities) {
+        for (auto e: actors) {
             e->control();
             e->setVelocity(collisions(e->getCollisionAABB().getGlobalBounds(), e->getVelocity()));
             e->update(elapsed);
@@ -262,12 +217,12 @@ void Game::loop() {
 
             app.draw(outline);
 
-            if (getTileContents(selectedTile) != nullptr) {
+            if (getTileActors(selectedTile) != nullptr) {
                 cout << "\n\n\n" << endl;
-                cout << "Before interaction " << getTileContents(selectedTile)->toString() << endl;
+                cout << "Before interaction " << getTileActors(selectedTile)->toString() << endl;
                 cout << "---------------------------------" << endl;
-                cout << "Damage applied: " << player.attack(getTileContents(selectedTile)) << endl;
-                cout << "After attack" << endl << getTileContents(selectedTile)->toString() << endl;
+                cout << "Damage applied: " << player.attack(getTileActors(selectedTile)) << endl;
+                cout << "After attack" << endl << getTileActors(selectedTile)->toString() << endl;
             }
             else {
                 cout << "No Target!" << endl;
@@ -316,15 +271,15 @@ sf::Vector2i Game::worldToTileCoord(sf::Vector2i pos) const {
     return newPos;
 }
 
-Entity *Game::getTileContents(Tile *t) {
+Actor *Game::getTileActors(Tile *t) {
     //There isn't a tile here.
     if (t == nullptr)
         return nullptr;
 
-    for (auto e: entities) {
-        sf::Vector2i testPos = worldToTileCoord(e->getPosition());
+    for (auto a: actors) {
+        sf::Vector2i testPos = worldToTileCoord(a->getPosition());
         if (t->getPos().y == testPos.x && t->getPos().x == testPos.y)
-            return e;
+            return a;
     }
 
     //There's nothing in this tile.

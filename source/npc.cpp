@@ -1,10 +1,10 @@
 #include "../include/npc.h"
 
-NPC::NPC(int x, int y) : Entity(x, y) {
+NPC::NPC(int x, int y) : Actor(x, y) {
     srand(time(0));
 }
 
-NPC::NPC(sf::Vector2f pos) : Entity(pos) {
+NPC::NPC(sf::Vector2f pos) : Actor(pos) {
     srand(time(0));
 }
 

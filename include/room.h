@@ -35,7 +35,6 @@ public:
 
 protected:
 private:
-    int subtr;
     vector<sf::Vector2i> doors;
     int x;
     int y;

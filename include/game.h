@@ -28,7 +28,7 @@ private:
 
     sf::Vector2i worldToTileCoord(sf::Vector2i) const;
 
-    Entity *getTileContents(Tile *);
+    Actor *getTileActors(Tile *);
 
     void drawShadows(Entity *);
 
@@ -39,8 +39,9 @@ private:
 
 
     Dungeon d;
-    vector<Map> floors;
+    //vector<Map> floors;
     vector<Entity *> entities;
+    vector<Actor *> actors;
 
     void runEvents();
 

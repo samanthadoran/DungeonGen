@@ -1,8 +1,10 @@
 #include "../include/entity.h"
 
+int Entity::nextUUID = -1;
+
 Entity::Entity(int x, int y) {
-    hp = 100;
-    damage = 1;
+    ++Entity::nextUUID;
+    UUID = Entity::nextUUID;
     tex.loadFromFile("link.png");
     m_sprite.setTexture(tex);
 
@@ -14,8 +16,8 @@ Entity::Entity(int x, int y) {
 }
 
 Entity::Entity(sf::Vector2f pos) {
-    hp = 100;
-    damage = 1;
+    ++Entity::nextUUID;
+    UUID = Entity::nextUUID;
     tex.loadFromFile("link.png");
     m_sprite.setTexture(tex);
 
@@ -49,6 +51,10 @@ sf::Vector2f Entity::getVelocity() const {
     return velocity;
 }
 
+unsigned int Entity::getUUID() const {
+    return UUID;
+}
+
 void Entity::setVelocity(sf::Vector2f vel) {
     velocity = vel;
 }
@@ -61,23 +67,6 @@ void Entity::setPosition(sf::Vector2i newPos) {
     int x = newPos.x;
     int y = newPos.y;
     position = sf::Vector2f(x, y);
-}
-
-double Entity::getHP() const {
-    return hp;
-}
-
-void Entity::setHP(double hp) {
-    this->hp = hp;
-}
-
-double Entity::attack(Entity *e) {
-    e->setHP(e->getHP() - this->getDamage());
-    return this->getDamage();
-}
-
-double Entity::getDamage() const {
-    return damage;
 }
 
 Entity::~Entity() {
