@@ -181,7 +181,7 @@ void Game::loop() {
             //We've released the key
             pressed = false;
 
-        selectedTile = selectTile(&player);
+        selectedTile = selectTile();
 
         if (selectedTile != nullptr) {
             sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
@@ -277,7 +277,7 @@ Actor *Game::getTileActors(Tile *t) {
     return nullptr;
 }
 
-Tile *Game::selectTile(Entity *centerRef) {
+Tile *Game::selectTile() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(app);
         sf::Vector2f toConvert = app.mapPixelToCoords(mousePos);

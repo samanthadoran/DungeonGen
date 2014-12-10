@@ -30,7 +30,7 @@ private:
 
     Actor *getTileActors(Tile *);
 
-    Tile *selectTile(Entity *);
+    Tile *selectTile();
 
     void drawShadows(Entity *);
 
