@@ -281,8 +281,10 @@ Tile *Game::selectTile(Entity *centerRef) {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(app);
         sf::Vector2f toConvert = app.mapPixelToCoords(mousePos);
-        sf::Vector2i testPos = worldToTileCoord(toConvert);
-        return d.getFloor(floor).getTileAtPos(testPos);
+        if (d.getFloor(floor).inBounds(toConvert)) {
+            sf::Vector2i testPos = worldToTileCoord(toConvert);
+            return d.getFloor(floor).getTileAtPos(testPos);
+        }
     }
     return nullptr;
 }

@@ -77,6 +77,16 @@ void Map::render() {
     cout << getTextualRepresentation();
 }
 
+bool Map::inBounds(sf::Vector2f test) const {
+    if (test.x / 32 < 0 || test.x / 32 > width)
+        return false;
+
+    if (test.y / 32 < 0 || test.y / 32 > height)
+        return false;
+
+    return true;
+}
+
 vector<vector<Tile *>> Map::getMap() const {
     return tiles;
 }

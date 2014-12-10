@@ -29,6 +29,8 @@ public:
 
     void render();
 
+    bool inBounds(sf::Vector2f) const;
+
     string getTextualRepresentation()const;
 
     int getWidth() const;
