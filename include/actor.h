@@ -5,9 +5,9 @@
 
 class Actor : public Entity {
 public:
-    Actor(int, int);
+    Actor(int, int, string);
 
-    Actor(sf::Vector2f);
+    Actor(sf::Vector2f, string);
 
     virtual void control() = 0;
 

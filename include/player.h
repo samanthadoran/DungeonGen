@@ -7,9 +7,9 @@ using std::vector;
 
 class Player : public Actor {
 public:
-    Player(int, int, int);
+    Player(int, int, int, string);
 
-    Player(sf::Vector2f, int);
+    Player(sf::Vector2f, int, string);
 
     std::string toString() const;
 

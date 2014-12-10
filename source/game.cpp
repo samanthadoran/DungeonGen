@@ -121,8 +121,8 @@ void Game::runTileEvent(Player *p) {
 void Game::loop() {
     bool pressed = false;
 
-    Player player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160);
-    NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+    Player player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png");
+    NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png");
     entities.push_back(&player);
     actors.push_back(&player);
     entities.push_back(&testnpc);
@@ -181,28 +181,7 @@ void Game::loop() {
             //We've released the key
             pressed = false;
 
-        selectedTile = nullptr;
-
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
-            sf::Vector2i mousePos = sf::Mouse::getPosition();
-            mousePos.x += (int) player.getPosition().x - app.getSize().x / 2;
-            mousePos.y += (int) player.getPosition().y - app.getSize().y / 2;
-            sf::Vector2i testPos = worldToTileCoord(mousePos);
-            selectedTile = d.getFloor(floor).getTileAtPos(testPos);
-        }
-
-        //Save the current dungeon
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
-            d.saveDungeon("default.txt");
-
-        //Load a dungeon...
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)) {
-            d = Dungeon("default.txt");
-            floor = 0;
-            player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
-            continue;
-        }
-
+        selectedTile = selectTile(&player);
 
         if (selectedTile != nullptr) {
             sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
@@ -213,7 +192,7 @@ void Game::loop() {
             outline.setPosition(outlinePos);
             outline.setFillColor(sf::Color::Transparent);
             outline.setOutlineColor(sf::Color::Red);
-            outline.setOutlineThickness(3.0);
+            outline.setOutlineThickness(1.0);
 
             app.draw(outline);
 
@@ -227,6 +206,18 @@ void Game::loop() {
             else {
                 cout << "No Target!" << endl;
             }
+        }
+
+        //Save the current dungeon
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
+            d.saveDungeon("default.txt");
+
+        //Load a dungeon...
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)) {
+            d = Dungeon("default.txt");
+            floor = 0;
+            player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+            continue;
         }
 
         for (auto e: entities)
@@ -283,6 +274,16 @@ Actor *Game::getTileActors(Tile *t) {
     }
 
     //There's nothing in this tile.
+    return nullptr;
+}
+
+Tile *Game::selectTile(Entity *centerRef) {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(app);
+        sf::Vector2f toConvert = app.mapPixelToCoords(mousePos);
+        sf::Vector2i testPos = worldToTileCoord(toConvert);
+        return d.getFloor(floor).getTileAtPos(testPos);
+    }
     return nullptr;
 }
 

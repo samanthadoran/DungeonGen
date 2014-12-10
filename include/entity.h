@@ -8,17 +8,16 @@
 
 #include "equipment.h"
 
+using std::string;
 
 class Entity {
 public:
 
-    //virtual void control() = 0;
-
     virtual std::string toString() const = 0;
 
-    Entity(int, int);
+    Entity(int, int, string);
 
-    Entity(sf::Vector2f);
+    Entity(sf::Vector2f, string);
 
     void update(sf::Time);
 
@@ -38,26 +37,12 @@ public:
 
     void setVelocity(sf::Vector2f);
 
-    /*
-    double getHP() const;
-
-    void setHP(double);
-
-    double getDamage() const;
-
-    //Returns change in HP of this argument
-    double attack(Entity *);*/
-
     virtual ~Entity();
 
 protected:
 private:
-    //double damage;
-    //double hp;
     unsigned int UUID;
     static int nextUUID;
-    //std::vector<Item> items;
-    //std::vector<Equipment> equipment;
 
     sf::Vector2f position;
     sf::Vector2f velocity;

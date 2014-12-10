@@ -1,10 +1,10 @@
 #include "../include/player.h"
 
-Player::Player(int x, int y, int terminalVelocity) : Actor(x, y) {
+Player::Player(int x, int y, int terminalVelocity, string filename) : Actor(x, y, filename) {
     this->terminalVelocity = terminalVelocity;
 }
 
-Player::Player(sf::Vector2f pos, int terminalVelocity) : Actor(pos) {
+Player::Player(sf::Vector2f pos, int terminalVelocity, string filename) : Actor(pos, filename) {
     this->terminalVelocity = terminalVelocity;
 }
 

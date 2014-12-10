@@ -1,10 +1,10 @@
 #include "../include/npc.h"
 
-NPC::NPC(int x, int y) : Actor(x, y) {
+NPC::NPC(int x, int y, string filename) : Actor(x, y, filename) {
     srand(time(0));
 }
 
-NPC::NPC(sf::Vector2f pos) : Actor(pos) {
+NPC::NPC(sf::Vector2f pos, string filename) : Actor(pos, filename) {
     srand(time(0));
 }
 

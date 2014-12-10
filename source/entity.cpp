@@ -2,10 +2,10 @@
 
 int Entity::nextUUID = -1;
 
-Entity::Entity(int x, int y) {
+Entity::Entity(int x, int y, string filename) {
     ++Entity::nextUUID;
     UUID = Entity::nextUUID;
-    tex.loadFromFile("link.png");
+    tex.loadFromFile(filename);
     m_sprite.setTexture(tex);
 
     collision = sf::RectangleShape(sf::Vector2f(12, 8));
@@ -15,10 +15,10 @@ Entity::Entity(int x, int y) {
     velocity = sf::Vector2f(0, 0);
 }
 
-Entity::Entity(sf::Vector2f pos) {
+Entity::Entity(sf::Vector2f pos, string filename) {
     ++Entity::nextUUID;
     UUID = Entity::nextUUID;
-    tex.loadFromFile("link.png");
+    tex.loadFromFile(filename);
     m_sprite.setTexture(tex);
 
     collision = sf::RectangleShape(sf::Vector2f(12, 8));

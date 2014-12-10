@@ -1,11 +1,13 @@
 #include "../include/actor.h"
 
-Actor::Actor(int x, int y) : Entity(x, y) {
-
+Actor::Actor(int x, int y, string filename) : Entity(x, y, filename) {
+    damage = 1;
+    hp = 100;
 }
 
-Actor::Actor(sf::Vector2f pos) : Entity(pos) {
-
+Actor::Actor(sf::Vector2f pos, string filename) : Entity(pos, filename) {
+    damage = 1;
+    hp = 100;
 }
 
 

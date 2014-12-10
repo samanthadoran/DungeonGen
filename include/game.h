@@ -30,6 +30,8 @@ private:
 
     Actor *getTileActors(Tile *);
 
+    Tile *selectTile(Entity *);
+
     void drawShadows(Entity *);
 
     void drawMinimap();
@@ -39,7 +41,6 @@ private:
 
 
     Dungeon d;
-    //vector<Map> floors;
     vector<Entity *> entities;
     vector<Actor *> actors;
 

@@ -7,15 +7,15 @@
 
 class NPC : public Actor {
 public:
-    NPC(int, int);
+    NPC(int, int, string);
+
+    NPC(sf::Vector2f, string);
 
     void control();
 
     double attack(Entity *);
 
     std::string toString() const;
-
-    NPC(sf::Vector2f);
 
     virtual ~NPC();
 
