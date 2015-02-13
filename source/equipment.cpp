@@ -1,13 +1,8 @@
 #include "../include/equipment.h"
 
-Equipment::Equipment() : Item("", 42) {
+Equipment::Equipment(sf::Vector2f pos, string filename, string name) : Item(pos, filename, name, 42) {
     //ctor
 }
-
-/*void Equipment::use(Entity * e)
-{
-    //e->equip(this);
-}*/
 
 Equipment::~Equipment() {
     //dtor

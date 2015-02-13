@@ -6,8 +6,6 @@
 #include <sstream>
 #include <SFML/Graphics.hpp>
 
-#include "equipment.h"
-
 using std::string;
 
 class Entity {

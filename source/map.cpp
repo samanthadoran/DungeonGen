@@ -22,6 +22,8 @@ Map::Map(int w, int h) {
                 adjacency[j][k].push_back(sf::Vector2i(k + 1, j));
         }
     }
+
+    //I'm sure this can be done better.
     textures.push_back(new sf::Texture());
     textures.back()->loadFromFile("floor.png");
     textures.push_back(new sf::Texture());
@@ -77,13 +79,17 @@ void Map::render() {
     cout << getTextualRepresentation();
 }
 
+//Tests whether or not a point lies within the bounds of the map.
 bool Map::inBounds(sf::Vector2f test) const {
+    //Out of map on the horizontal axis
     if (test.x / 32 < 0 || test.x / 32 > width)
         return false;
 
+    //Out of map on the vertical axis
     if (test.y / 32 < 0 || test.y / 32 > height)
         return false;
 
+    //In bounds
     return true;
 }
 

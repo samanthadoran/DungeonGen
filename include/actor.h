@@ -2,6 +2,8 @@
 #define ACTOR_H
 
 #include "entity.h"
+#include "equipment.h"
+
 
 class Actor : public Entity {
 public:
@@ -27,8 +29,8 @@ public:
 private:
     double damage;
     double hp;
-    std::vector<Item> items;
-    std::vector<Equipment> equipment;
+    //std::vector<Item> items;
+    //std::vector<Equipment> equipment;
 };
 
 #endif

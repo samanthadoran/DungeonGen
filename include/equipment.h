@@ -6,9 +6,8 @@
 
 class Equipment : public Item {
 public:
-    Equipment();
+    Equipment(sf::Vector2f, string, string);
 
-    //void use(Entity *);
     virtual ~Equipment();
 
 protected:

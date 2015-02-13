@@ -250,8 +250,8 @@ sf::Vector2f Game::tileToWorldCoord(sf::Vector2i toConv) const {
 
 sf::Vector2i Game::worldToTileCoord(sf::Vector2f pos) const {
     sf::Vector2i newPos;
-    newPos.x = pos.x / 32;
-    newPos.y = pos.y / 32;
+    newPos.x = int(pos.x / 32);
+    newPos.y = int(pos.y / 32);
     return newPos;
 }
 
@@ -323,5 +323,8 @@ void Game::drawMinimap() {
 }
 
 Game::~Game() {
-
+    for (auto &e: entities) {
+        delete e;
+        e = nullptr;
+    }
 }
