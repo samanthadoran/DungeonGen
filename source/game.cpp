@@ -135,8 +135,6 @@ void Game::loop() {
     //Start the game loop
     music.play();
 
-    elapsed = clk.restart();
-
     while (app.isOpen()) {
         elapsed = clk.restart();
 
