@@ -91,6 +91,8 @@ bool Map::inBounds(sf::Vector2f test) const {
 
     //In bounds
     return true;
+
+    //return getTileAtPos(test) != nullptr;
 }
 
 vector<vector<Tile *>> Map::getMap() const {
@@ -372,14 +374,22 @@ sf::Vector2i Map::getStairsDownSpawn() const {
     return stairsDownSpawn;
 }
 
-Tile *Map::getTileAtPos(sf::Vector2f input) {
-    int x = input.x;
-    int y = input.y;
+const Tile *const Map::getTileAtPos(sf::Vector2f input) const {
+    int x = input.x / 32;
+    int y = input.y / 32;
 
-    return tiles[y][x];
+    return getTileAtPos(sf::Vector2i(x, y));
 }
 
-Tile *Map::getTileAtPos(sf::Vector2i input) {
+const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
+    //Check y bound
+    if (input.y < 0 || input.y >= tiles.size())
+        return nullptr;
+
+    //Check x bound
+    if (input.x < 0 || input.x >= tiles[0].size())
+        return nullptr;
+
     return tiles[input.y][input.x];
 }
 

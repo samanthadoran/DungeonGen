@@ -43,9 +43,9 @@ public:
 
     sf::Vector2i getStairsDownSpawn() const;
 
-    Tile *getTileAtPos(sf::Vector2f);
+    const Tile *const getTileAtPos(sf::Vector2f) const;
 
-    Tile *getTileAtPos(sf::Vector2i);
+    const Tile *const getTileAtPos(sf::Vector2i) const;
 
     virtual ~Map();
 

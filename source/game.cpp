@@ -73,7 +73,14 @@ void Game::runEvents() {
 //Returns a modified vector to obey collision models
 sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const {
     sf::Rect<float> future = test;
+
+    sf::Vector2f futurePos;
+
     future.left += movement.x * elapsed.asSeconds();
+    futurePos = sf::Vector2f(future.left, future.top);
+    if (!d.getFloor(floor).inBounds(futurePos)) {
+        movement.x = 0;
+    }
 
     for (auto row: d.getFloor(floor).getMap())
         for (auto tile: row)
@@ -82,6 +89,10 @@ sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const
 
     future = test;
     future.top += movement.y * elapsed.asSeconds();
+    futurePos = sf::Vector2f(future.left, future.top);
+    if (!d.getFloor(floor).inBounds(futurePos)) {
+        movement.y = 0;
+    }
 
     for (auto row: d.getFloor(floor).getMap())
         for (auto tile: row)
@@ -92,7 +103,7 @@ sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const
 }
 
 void Game::runTileEvent(Player *p) {
-    Tile *t = d.getFloor(floor).getTileAtPos(worldToTileCoord(p->getPosition()));
+    const Tile *t = d.getFloor(floor).getTileAtPos(worldToTileCoord(p->getPosition()));
     TileType type = t->getTileType();
 
     switch (type) {
@@ -179,7 +190,7 @@ void Game::loop() {
             //We've released the key
             pressed = false;
 
-        selectedTile = selectTile();
+        selectedTile = (Tile *) (selectTile());
 
         if (selectedTile != nullptr) {
             sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
@@ -194,16 +205,8 @@ void Game::loop() {
 
             app.draw(outline);
 
-            if (getTileActors(selectedTile) != nullptr) {
-                cout << "\n\n\n" << endl;
-                cout << "Before interaction " << getTileActors(selectedTile)->toString() << endl;
-                cout << "---------------------------------" << endl;
-                cout << "Damage applied: " << player.attack(getTileActors(selectedTile)) << endl;
-                cout << "After attack" << endl << getTileActors(selectedTile)->toString() << endl;
-            }
-            else {
-                cout << "No Target!" << endl;
-            }
+            if (getTileActors(selectedTile) != nullptr)
+                player.attack(getTileActors(selectedTile));
         }
 
         //Save the current dungeon
@@ -275,7 +278,7 @@ Actor *Game::getTileActors(Tile *t) {
     return nullptr;
 }
 
-Tile *Game::selectTile() {
+const Tile *const Game::selectTile() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
         sf::Vector2i mousePos = sf::Mouse::getPosition(app);
         sf::Vector2f toConvert = app.mapPixelToCoords(mousePos);
