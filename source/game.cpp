@@ -108,10 +108,8 @@ void Game::runTileEvent(Player *p) {
 
     switch (type) {
         case TileType::STAIRS_UP:
-            if (floor == 0) {
-                cout << "You left the dungeon, exiting program..." << endl;
+            if (floor == 0)
                 app.close();
-            }
             else {
                 --floor;
                 p->setPosition(tileToWorldCoord(d.getFloor(floor).getStairsDownSpawn()));
@@ -149,7 +147,7 @@ void Game::loop() {
     while (app.isOpen()) {
         elapsed = clk.restart();
 
-        // Clear screen
+        //Clear screen
         app.clear();
 
         //Check for application events.
@@ -196,7 +194,7 @@ void Game::loop() {
             sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
 
             //IMPORTANT: Tile accesses are reflected over y = x! so remember, swap x and y!
-            sf::Vector2f outlinePos = sf::Vector2f(selectedTile->getPos().y * 32, selectedTile->getPos().x * 32);
+            sf::Vector2f outlinePos = tileToWorldCoord(selectedTile->getPos());
 
             outline.setPosition(outlinePos);
             outline.setFillColor(sf::Color::Transparent);
@@ -246,20 +244,21 @@ sf::Vector2f Game::tileToWorldCoord(sf::Vector2i toConv) const {
     float x = toConv.x * 32;
     float y = toConv.y * 32;
 
-    return sf::Vector2f(x, y);
+    //Remember, tile coordinates are (y, x)
+    return sf::Vector2f(y, x);
 }
 
 sf::Vector2i Game::worldToTileCoord(sf::Vector2f pos) const {
     sf::Vector2i newPos;
-    newPos.x = int(pos.x / 32);
-    newPos.y = int(pos.y / 32);
+    newPos.x = int(pos.y / 32);
+    newPos.y = int(pos.x / 32);
     return newPos;
 }
 
 sf::Vector2i Game::worldToTileCoord(sf::Vector2i pos) const {
     sf::Vector2i newPos;
-    newPos.x = pos.x / 32;
-    newPos.y = pos.y / 32;
+    newPos.x = pos.y / 32;
+    newPos.y = pos.x / 32;
     return newPos;
 }
 
@@ -280,12 +279,9 @@ Actor *Game::getTileActors(Tile *t) {
 
 const Tile *const Game::selectTile() {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(app);
-        sf::Vector2f toConvert = app.mapPixelToCoords(mousePos);
-        if (d.getFloor(floor).inBounds(toConvert)) {
-            sf::Vector2i testPos = worldToTileCoord(toConvert);
-            return d.getFloor(floor).getTileAtPos(testPos);
-        }
+        sf::Vector2f tilePos = app.mapPixelToCoords(sf::Mouse::getPosition(app));
+        if (d.getFloor(floor).inBounds(tilePos))
+            return d.getFloor(floor).getTileAtPos(tilePos);
     }
     return nullptr;
 }

@@ -16,14 +16,13 @@ Dungeon::Dungeon(int width, int height) {
 Dungeon::Dungeon(string filename) {
     ifstream ifp(filename);
     cout << "Loading..." << endl;
-    if (!ifp.is_open()) {
-        cout << "Failed to open the file!" << endl;
+    if (!ifp.is_open())
         return;
-    }
+
     int numFloors;
     int height;
     int width;
-    cout << "Discerning dimensions..." << endl;
+
     ifp >> height;
     ifp >> width;
     ifp >> numFloors;
@@ -33,7 +32,6 @@ Dungeon::Dungeon(string filename) {
 
     //Iterate over all specified floors
     for (int j = 0; j < numFloors; ++j) {
-        cout << "Added a floor..." << endl;
         floors.push_back(Map(height, width));
         string row;
 
@@ -50,7 +48,6 @@ Dungeon::Dungeon(string filename) {
     }
     //Clean up
     ifp.close();
-    cout << "Done reading from file... " << endl;
 }
 
 //Return all of the floors
@@ -71,18 +68,14 @@ void Dungeon::addFloor() {
 
 //Save to file...
 void Dungeon::saveDungeon(string filename) const {
-    cout << "Saving..." << endl;
     ofstream ofp(filename);
-    if (!ofp.is_open()) {
-        cout << "Failed to open file!" << endl;
-        return;
-    }
 
-    if (floors[0].getHeight() == 0 || floors[0].getWidth() == 0) {
-        //Empty Map
-        cout << "There is no map here" << endl;
+    if (!ofp.is_open())
         return;
-    }
+
+    //Empty Map
+    if (floors[0].getHeight() == 0 || floors[0].getWidth() == 0)
+        return;
 
     //Setup the header
     ofp << floors[0].getHeight() << endl;
@@ -95,8 +88,6 @@ void Dungeon::saveDungeon(string filename) const {
 
     //Clean up
     ofp.close();
-
-    cout << "Saved!" << endl;
 }
 
 Dungeon::~Dungeon() {

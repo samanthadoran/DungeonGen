@@ -38,14 +38,16 @@ void Map::initStairSpawns() {
     sf::Vector2i workingVec = stairsUpPos;
     for (sf::Vector2i p: adjacency[workingVec.y][workingVec.x])
         if (tiles[p.y][p.x]->getTileType() == TileType::FLOOR) {
-            stairsUpSpawn = p;
+            stairsUpSpawn = sf::Vector2i(p.y, p.x);
+            //stairsUpSpawn = p;
             break;
         }
 
     workingVec = stairsDownPos;
     for (sf::Vector2i p: adjacency[workingVec.y][workingVec.x])
         if (tiles[p.y][p.x]->getTileType() == TileType::FLOOR) {
-            stairsDownSpawn = p;
+            //stairsDownSpawn = p;
+            stairsDownSpawn = sf::Vector2i(p.y, p.x);
             break;
         }
 }
@@ -81,18 +83,7 @@ void Map::render() {
 
 //Tests whether or not a point lies within the bounds of the map.
 bool Map::inBounds(sf::Vector2f test) const {
-    //Out of map on the horizontal axis
-    if (test.x / 32 < 0 || test.x / 32 > width)
-        return false;
-
-    //Out of map on the vertical axis
-    if (test.y / 32 < 0 || test.y / 32 > height)
-        return false;
-
-    //In bounds
-    return true;
-
-    //return getTileAtPos(test) != nullptr;
+    return getTileAtPos(test) != nullptr;
 }
 
 vector<vector<Tile *>> Map::getMap() const {
@@ -101,10 +92,10 @@ vector<vector<Tile *>> Map::getMap() const {
 
 //What was I even doing?
 bool Map::addRoom(int xPos, int yPos, int wid, int length) {
-    if (wid > width || length > height)
+    if (getTileAtPos(sf::Vector2i(xPos, yPos)) == nullptr)
         return false;
 
-    if (xPos + wid >= width || yPos + length >= height)
+    if (getTileAtPos(sf::Vector2i(xPos + wid, yPos + length)) == nullptr)
         return false;
 
     Room r(xPos, yPos, wid, length);
@@ -374,9 +365,10 @@ sf::Vector2i Map::getStairsDownSpawn() const {
     return stairsDownSpawn;
 }
 
+//These are dealing with world coordinates
 const Tile *const Map::getTileAtPos(sf::Vector2f input) const {
-    int x = input.x / 32;
-    int y = input.y / 32;
+    int x = input.y / 32;
+    int y = input.x / 32;
 
     return getTileAtPos(sf::Vector2i(x, y));
 }
@@ -390,7 +382,7 @@ const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
     if (input.x < 0 || input.x >= tiles[0].size())
         return nullptr;
 
-    return tiles[input.y][input.x];
+    return tiles[input.x][input.y];
 }
 
 Map::~Map() {
