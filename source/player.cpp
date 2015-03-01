@@ -13,9 +13,8 @@ Player::Player(sf::Vector2f pos, int terminalVelocity, string filename) : Actor(
 }
 
 void Player::act(Actor *a) {
-    ;
-    //Item * i = selectedItem;
-    //i.act(a);
+    Actor *item = getItems()[0];
+    item->act(a);
 }
 
 void Player::control() {

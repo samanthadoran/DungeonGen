@@ -12,6 +12,14 @@ void Item::act(Actor *a) {
     a->setHP(a->getHP() - this->getDamage());
 }
 
+
+string Item::toString() const {
+    return "" + getName() + " with " + "100" + " uses.";
+}
+
+void Item::control() {
+    ;
+}
 Item::~Item() {
     //dtor
 }

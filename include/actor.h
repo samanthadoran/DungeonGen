@@ -1,9 +1,12 @@
 #ifndef ACTOR_H
 #define ACTOR_H
 
+class Item;
 #include "entity.h"
+#include <vector>
 
 using std::string;
+using std::vector;
 
 class Actor : public Entity {
 public:
@@ -23,9 +26,16 @@ public:
 
     double getDamage() const;
 
+    vector<Actor *> getItems() const;
+
+    string getName() const;
+
+    void addItem(Actor *);
+
     virtual ~Actor();
 
 private:
+    vector<Actor *> items;
     string name;
     double damage;
     double hp;

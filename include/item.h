@@ -11,6 +11,10 @@ class Item : public Actor {
 public:
     Item(sf::Vector2f, string, string, int);
 
+    string toString() const;
+
+    void control();
+
     void act(Actor *);
 
     virtual ~Item();

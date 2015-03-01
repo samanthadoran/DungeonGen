@@ -72,6 +72,7 @@ void Entity::setPosition(sf::Vector2i newPos) {
 Entity &Entity::operator=(const Entity &other) {
     tex = sf::Texture(*other.getSprite().getTexture());
     position = other.position;
+    velocity = other.getVelocity();
     UUID = other.getUUID();
     collision = other.getCollisionAABB();
     return *this;

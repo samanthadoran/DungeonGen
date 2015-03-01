@@ -12,6 +12,18 @@ Actor::Actor(sf::Vector2f pos, string filename, string name) : Entity(pos, filen
     hp = 100;
 }
 
+vector<Actor *> Actor::getItems() const {
+    return items;
+}
+
+void Actor::addItem(Actor *a) {
+    items.push_back(a);
+}
+
+string Actor::getName() const {
+    return name;
+}
+
 double Actor::getHP() const {
     return hp;
 }

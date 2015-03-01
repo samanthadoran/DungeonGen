@@ -66,6 +66,7 @@ private:
     sf::Music music;
 
     //Debug info
+    string debugText;
     sf::Font font;
     sf::Clock clk;
 

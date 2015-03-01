@@ -2,13 +2,13 @@
 
 using namespace std;
 
-Game::Game() {// : d(78,78), player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png") {
+Game::Game() {
     selectedTile = nullptr;
     floor = 0;
     d = Dungeon(78, 78);
     player = Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png");
     //TODO: Generate items and equipment
-    //TODO: Generate NPCs
+    //TODO: Fix NPCs
 
     music.openFromFile("music.ogg");
     music.setLoop(true);
@@ -18,9 +18,6 @@ Game::Game() {// : d(78,78), player(tileToWorldCoord(d.getFloor(floor).getStairs
 
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
-
-    //Hacky way to get crisp bitmap glyphs
-    //const_cast<sf::Texture &>(font.getTexture(text.getCharacterSize())).setSmooth(false);
 
     //adjust the view to center on map
     sf::View view = app.getView();
@@ -145,6 +142,7 @@ void Game::runTileEvent(Player *p) {
 void Game::loop() {
     bool pressed = false;
     NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png");
+    player.addItem((Actor *) new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1));
     entities.push_back(&player);
     actors.push_back(&player);
     entities.push_back(&testnpc);
@@ -203,11 +201,13 @@ void Game::loop() {
             app.draw(e->getSprite());
 
         //Update the debug info every second
-        /*if (textclk.getElapsedTime().asSeconds() >= 1) {
-            if(debug)
-                showText(updateDebug(), debugPos);
+        if (textclk.getElapsedTime().asSeconds() >= 1) {
+            updateDebug();
             textclk.restart();
-        }*/
+        }
+
+        if (debug)
+            showText(debugText, debugPos);
 
         // Update the window
         app.display();
@@ -243,7 +243,8 @@ Actor *Game::getTileActors(Tile *t) {
 
     for (auto a: actors) {
         sf::Vector2i testPos = worldToTileCoord(a->getPosition());
-        if (t->getPos().y == testPos.x && t->getPos().x == testPos.y)
+        //if (t->getPos().y == testPos.x && t->getPos().x == testPos.y)
+        if (t->getPos() == testPos);
             return a;
     }
 
@@ -324,6 +325,8 @@ string Game::updateDebug() {
     stringstream info;
     info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
+
+    debugText = info.str();
 
     return info.str();
 }

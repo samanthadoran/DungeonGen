@@ -1,13 +1,14 @@
 #ifndef MAP_H
 #define MAP_H
 
+//TODO: Inherit sf::drawable
+
 #include <vector>
 #include <sstream>
 #include <string>
 #include <iostream>
 #include <random>
 #include <time.h>
-#include <algorithm>
 
 #include "tile.h"
 #include "room.h"
@@ -68,6 +69,7 @@ private:
 
     void addPath(vector<sf::Vector2i>);
 
+    //Please replace.
     bool addRoom(int, int, int, int);
 
     vector<Room> rooms;
