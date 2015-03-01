@@ -1,11 +1,17 @@
 #include "../include/npc.h"
 
-NPC::NPC(int x, int y, string filename) : Actor(x, y, filename) {
+NPC::NPC(int x, int y, string filename) : Actor(x, y, filename, "Player") {
     srand(time(0));
 }
 
-NPC::NPC(sf::Vector2f pos, string filename) : Actor(pos, filename) {
+NPC::NPC(sf::Vector2f pos, string filename) : Actor(pos, filename, "Player") {
     srand(time(0));
+}
+
+void NPC::act(Actor *a) {
+    ;
+    //Item * i = selectedItem;
+    //i.act(a);
 }
 
 void NPC::control() {

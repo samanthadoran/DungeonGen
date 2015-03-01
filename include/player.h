@@ -2,14 +2,20 @@
 #define PLAYER_H
 
 #include "actor.h"
+#include <iostream>
+
+using namespace std;
 
 using std::vector;
 
 class Player : public Actor {
 public:
+    Player();
     Player(int, int, int, string);
 
     Player(sf::Vector2f, int, string);
+
+    void act(Actor *);
 
     std::string toString() const;
 

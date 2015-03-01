@@ -35,6 +35,8 @@ public:
 
     void setVelocity(sf::Vector2f);
 
+    Entity &operator=(const Entity &);
+
     virtual ~Entity();
 
 protected:

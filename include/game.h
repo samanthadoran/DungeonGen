@@ -36,11 +36,18 @@ private:
 
     void drawMinimap();
 
+    void drawTileOutline(Tile *t);
+
+    void showText(string, sf::Vector2f);
+
+    string updateDebug();
+
     Tile *selectedTile;
     int floor;
 
 
     Dungeon d;
+    Player player;
     vector<Entity *> entities;
     vector<Actor *> actors;
 
@@ -60,7 +67,6 @@ private:
 
     //Debug info
     sf::Font font;
-    sf::Text text;
     sf::Clock clk;
 
     sf::Time elapsed;

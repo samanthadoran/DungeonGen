@@ -1,11 +1,21 @@
 #include "../include/player.h"
 
-Player::Player(int x, int y, int terminalVelocity, string filename) : Actor(x, y, filename) {
+Player::Player() : Actor(0, 0, "link.png", "don'tuse") {
+    ;
+}
+
+Player::Player(int x, int y, int terminalVelocity, string filename) : Actor(x, y, filename, "Player") {
     this->terminalVelocity = terminalVelocity;
 }
 
-Player::Player(sf::Vector2f pos, int terminalVelocity, string filename) : Actor(pos, filename) {
+Player::Player(sf::Vector2f pos, int terminalVelocity, string filename) : Actor(pos, filename, "Player") {
     this->terminalVelocity = terminalVelocity;
+}
+
+void Player::act(Actor *a) {
+    ;
+    //Item * i = selectedItem;
+    //i.act(a);
 }
 
 void Player::control() {

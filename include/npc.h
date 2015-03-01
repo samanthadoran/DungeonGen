@@ -11,6 +11,8 @@ public:
 
     NPC(sf::Vector2f, string);
 
+    void act(Actor *);
+
     void control();
 
     double attack(Entity *);

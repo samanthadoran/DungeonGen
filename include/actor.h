@@ -2,18 +2,20 @@
 #define ACTOR_H
 
 #include "entity.h"
-#include "equipment.h"
 
+using std::string;
 
 class Actor : public Entity {
 public:
-    Actor(int, int, string);
+    Actor(int, int, string, string);
 
-    Actor(sf::Vector2f, string);
+    Actor(sf::Vector2f, string, string);
 
     virtual void control() = 0;
 
     virtual std::string toString() const = 0;
+
+    virtual void act(Actor *) = 0;
 
     double getHP() const;
 
@@ -21,16 +23,12 @@ public:
 
     double getDamage() const;
 
-    //Returns change in HP of this argument
-    double attack(Actor *);
-
     virtual ~Actor();
 
 private:
+    string name;
     double damage;
     double hp;
-    std::vector<Item> items;
-    std::vector<Equipment> equipment;
 };
 
 #endif

@@ -1,21 +1,22 @@
 #ifndef ITEM_H
 #define ITEM_H
-#include "entity.h"
+
+#include "actor.h"
 
 #include <string>
 
 using std::string;
 
-class Item : public Entity {
+class Item : public Actor {
 public:
     Item(sf::Vector2f, string, string, int);
+
+    void act(Actor *);
 
     virtual ~Item();
 
 protected:
 private:
-    string name;
-    int uses;
 };
 
 #endif // ITEM_H

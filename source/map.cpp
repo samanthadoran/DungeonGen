@@ -34,19 +34,18 @@ Map::Map(int w, int h) {
     textures.back()->loadFromFile("stairs_up.png");
 }
 
+//Consider removing in favour of finding where the stairs are on each floor change
 void Map::initStairSpawns() {
     sf::Vector2i workingVec = stairsUpPos;
     for (sf::Vector2i p: adjacency[workingVec.y][workingVec.x])
         if (tiles[p.y][p.x]->getTileType() == TileType::FLOOR) {
             stairsUpSpawn = sf::Vector2i(p.y, p.x);
-            //stairsUpSpawn = p;
             break;
         }
 
     workingVec = stairsDownPos;
     for (sf::Vector2i p: adjacency[workingVec.y][workingVec.x])
         if (tiles[p.y][p.x]->getTileType() == TileType::FLOOR) {
-            //stairsDownSpawn = p;
             stairsDownSpawn = sf::Vector2i(p.y, p.x);
             break;
         }
@@ -367,10 +366,11 @@ sf::Vector2i Map::getStairsDownSpawn() const {
 
 //These are dealing with world coordinates
 const Tile *const Map::getTileAtPos(sf::Vector2f input) const {
-    int x = input.y / 32;
-    int y = input.x / 32;
+    int x = input.x / 32;
+    int y = input.y / 32;
 
-    return getTileAtPos(sf::Vector2i(x, y));
+    //Remember to swap x & y
+    return getTileAtPos(sf::Vector2i(y, x));
 }
 
 const Tile *const Map::getTileAtPos(sf::Vector2i input) const {

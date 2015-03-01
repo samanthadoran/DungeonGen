@@ -2,10 +2,11 @@
 
 using namespace std;
 
-Game::Game() {
+Game::Game() {// : d(78,78), player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png") {
     selectedTile = nullptr;
     floor = 0;
     d = Dungeon(78, 78);
+    player = Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png");
     //TODO: Generate items and equipment
     //TODO: Generate NPCs
 
@@ -18,12 +19,8 @@ Game::Game() {
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
 
-    text = sf::Text("", font);
-    text.setCharacterSize(16);
-    text.setColor(sf::Color::White);
-
     //Hacky way to get crisp bitmap glyphs
-    const_cast<sf::Texture &>(font.getTexture(text.getCharacterSize())).setSmooth(false);
+    //const_cast<sf::Texture &>(font.getTexture(text.getCharacterSize())).setSmooth(false);
 
     //adjust the view to center on map
     sf::View view = app.getView();
@@ -65,8 +62,26 @@ void Game::runEvents() {
             app.close();
 
         //Escape key: exit
-        if (event.type == sf::Event::KeyPressed) if (event.key.code == sf::Keyboard::Escape)
-            app.close();
+        if (event.type == sf::Event::KeyPressed) {
+            switch (event.key.code) {
+                case sf::Keyboard::Escape:
+                    app.close();
+                    break;
+                case sf::Keyboard::F1:
+                    debug = !debug;
+                    break;
+                case sf::Keyboard::F5:
+                    d.saveDungeon("default.txt");
+                    break;
+                case sf::Keyboard::F9:
+                    d = Dungeon("default.txt");
+                    floor = 0;
+                    player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
 
@@ -129,8 +144,6 @@ void Game::runTileEvent(Player *p) {
 
 void Game::loop() {
     bool pressed = false;
-
-    Player player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png");
     NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png");
     entities.push_back(&player);
     actors.push_back(&player);
@@ -165,6 +178,7 @@ void Game::loop() {
         sf::View currView = app.getView();
         currView.setCenter(player.getPosition());
         app.setView(currView);
+        sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2), app.getView().getCenter().y - (currView.getSize().y / 2));
 
         //Draw the map to the screen
         for (auto j: d.getFloor(floor).getMap())
@@ -177,63 +191,23 @@ void Game::loop() {
         //Experimental minimap stuff
         drawMinimap();
 
-        //We only want to detect this on press~
-        if (!pressed && sf::Keyboard::isKeyPressed(sf::Keyboard::F1)) {
-            //We've pressed it!
-            pressed = true;
-            //Toggle debug status
-            debug = !debug;
-        }
-        else if (pressed && !sf::Keyboard::isKeyPressed(sf::Keyboard::F1))
-            //We've released the key
-            pressed = false;
-
         selectedTile = (Tile *) (selectTile());
 
         if (selectedTile != nullptr) {
-            sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
-
-            //IMPORTANT: Tile accesses are reflected over y = x! so remember, swap x and y!
-            sf::Vector2f outlinePos = tileToWorldCoord(selectedTile->getPos());
-
-            outline.setPosition(outlinePos);
-            outline.setFillColor(sf::Color::Transparent);
-            outline.setOutlineColor(sf::Color::Red);
-            outline.setOutlineThickness(1.0);
-
-            app.draw(outline);
-
+            drawTileOutline(selectedTile);
             if (getTileActors(selectedTile) != nullptr)
-                player.attack(getTileActors(selectedTile));
-        }
-
-        //Save the current dungeon
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5))
-            d.saveDungeon("default.txt");
-
-        //Load a dungeon...
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F9)) {
-            d = Dungeon("default.txt");
-            floor = 0;
-            player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
-            continue;
+                player.act(getTileActors(selectedTile));
         }
 
         for (auto e: entities)
             app.draw(e->getSprite());
 
         //Update the debug info every second
-        if (textclk.getElapsedTime().asSeconds() >= 1) {
-            std::stringstream info;
-            info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
-            info << "\nFloor: " << floor + 1;
-            text.setString(info.str());
+        /*if (textclk.getElapsedTime().asSeconds() >= 1) {
+            if(debug)
+                showText(updateDebug(), debugPos);
             textclk.restart();
-        }
-
-        //Align the text to the viewport
-        text.setPosition(currView.getCenter().x - (currView.getSize().x / 2), app.getView().getCenter().y - (currView.getSize().y / 2));
-        app.draw(text);
+        }*/
 
         // Update the window
         app.display();
@@ -304,6 +278,20 @@ void Game::drawShadows(Entity *focus) {
     app.draw(helper, sf::BlendMultiply);
 }
 
+void Game::drawTileOutline(Tile *t) {
+    sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
+
+    //IMPORTANT: Tile accesses are reflected over y = x! so remember, swap x and y!
+    sf::Vector2f outlinePos = tileToWorldCoord(selectedTile->getPos());
+
+    outline.setPosition(outlinePos);
+    outline.setFillColor(sf::Color::Transparent);
+    outline.setOutlineColor(sf::Color::Red);
+    outline.setOutlineThickness(1.0);
+
+    app.draw(outline);
+}
+
 void Game::drawMinimap() {
     sf::View standard = app.getView();
     unsigned int size = 400; // The 'minimap' view will show a smaller picture of the map
@@ -317,6 +305,27 @@ void Game::drawMinimap() {
         for (auto k: j)
             app.draw(k->getGraphicalRepresentation());
     app.setView(standard);
+}
+
+void Game::showText(string s, sf::Vector2f pos) {
+    sf::Text t;
+    t = sf::Text("", font);
+    t.setCharacterSize(16);
+    t.setColor(sf::Color::White);
+    t.setFont(font);
+
+    t.setPosition(pos);
+    t.setString(s);
+
+    app.draw(t);
+}
+
+string Game::updateDebug() {
+    stringstream info;
+    info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
+    info << "\nFloor: " << floor + 1;
+
+    return info.str();
 }
 
 Game::~Game() {
