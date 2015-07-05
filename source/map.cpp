@@ -210,6 +210,10 @@ vector<vector<sf::Vector2i>> Map::djikstra(sf::Vector2i src) const {
     return shortestPath;
 }
 
+vector<sf::Vector2i> Map::generatePath(Tile *from, Tile *to) const {
+    return generatePath(from->getPos(), to->getPos());
+}
+
 vector<sf::Vector2i> Map::generatePath(sf::Vector2i p1, sf::Vector2i p2) const {
     vector<vector<sf::Vector2i>> shortestPath = djikstra(p1);
 
@@ -386,5 +390,4 @@ const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
 }
 
 Map::~Map() {
-
 }

@@ -4,12 +4,15 @@
 #include <random>
 #include <time.h>
 #include "actor.h"
+#include "map.h"
 
 class NPC : public Actor {
 public:
-    NPC(int, int, string);
+    Actor *target;
 
-    NPC(sf::Vector2f, string);
+    NPC(int, int, string, Map *);
+
+    NPC(sf::Vector2f, string, Map *);
 
     void act(Actor *);
 
@@ -23,6 +26,7 @@ public:
 
 protected:
 private:
+    Map *m;
 };
 
 #endif // NPC_H

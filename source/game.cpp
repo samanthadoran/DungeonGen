@@ -141,8 +141,11 @@ void Game::runTileEvent(Player *p) {
 
 void Game::loop() {
     bool pressed = false;
-    NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png");
-    player.addItem((Actor *) new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1));
+    Map currMap = d.getFloor(floor);
+    NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png", &currMap);
+    testnpc.target = &player;
+    player.addItem(new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1, 200));
+    testnpc.addItem(new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1, 200));
     entities.push_back(&player);
     actors.push_back(&player);
     entities.push_back(&testnpc);
@@ -243,8 +246,7 @@ Actor *Game::getTileActors(Tile *t) {
 
     for (auto a: actors) {
         sf::Vector2i testPos = worldToTileCoord(a->getPosition());
-        //if (t->getPos().y == testPos.x && t->getPos().x == testPos.y)
-        if (t->getPos() == testPos);
+        if (t->getPos() == testPos)
             return a;
     }
 
@@ -325,6 +327,7 @@ string Game::updateDebug() {
     stringstream info;
     info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
+    info << "\n" << player.toString();
 
     debugText = info.str();
 

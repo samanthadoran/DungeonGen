@@ -8,7 +8,7 @@ Dungeon::Dungeon() {
 Dungeon::Dungeon(int width, int height) {
     x = width;
     y = height;
-    floors.push_back(Map(x, y));
+    floors.emplace_back(x, y);
     floors.back().generateMap();
 }
 

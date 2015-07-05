@@ -1,12 +1,17 @@
 #include "../include/item.h"
 
 
-Item::Item(sf::Vector2f pos, string filename, string name, int uses) : Actor(pos, filename, name) {
+Item::Item(sf::Vector2f pos, string filename, string name, int uses, int reUse) : Actor(pos, filename, name) {
+    coolDown = reUse;
     //ctor
 }
 
 void Item::act(Actor *a) {
-    //Update item uses
+    //Don't spam items!
+    if (coolDownTimer.getElapsedTime().asMilliseconds() < coolDown)
+        return;
+    coolDownTimer.restart();
+
     setHP(getHP() - 1);
 
     a->setHP(a->getHP() - this->getDamage());
@@ -14,7 +19,9 @@ void Item::act(Actor *a) {
 
 
 string Item::toString() const {
-    return "" + getName() + " with " + "100" + " uses.";
+    std::stringstream toRet;
+    toRet << getName() << " with " << getHP() << " uses.";
+    return toRet.str();
 }
 
 void Item::control() {

@@ -48,6 +48,8 @@ public:
 
     const Tile *const getTileAtPos(sf::Vector2i) const;
 
+    vector<sf::Vector2i> generatePath(Tile *, Tile *) const;
+
     virtual ~Map();
 
 protected:

@@ -9,7 +9,7 @@ using std::string;
 
 class Item : public Actor {
 public:
-    Item(sf::Vector2f, string, string, int);
+    Item(sf::Vector2f, string, string, int, int);
 
     string toString() const;
 
@@ -21,6 +21,8 @@ public:
 
 protected:
 private:
+    double coolDown;
+    sf::Clock coolDownTimer;
 };
 
 #endif // ITEM_H
