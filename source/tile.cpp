@@ -1,4 +1,5 @@
 #include "../include/tile.h"
+
 Tile::Tile(vector<sf::Texture *> *tex, int x, int y, TileType t) :
         type(t) {
     textures = tex;
@@ -136,5 +137,6 @@ void Tile::setTileType(TileType t) {
 }
 
 Tile::~Tile() {
+    textures = nullptr;
     //dtor
 }

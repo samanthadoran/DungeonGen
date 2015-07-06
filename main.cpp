@@ -7,7 +7,7 @@ int main() {
     srand(time(0));
 
     Game g;
-    g.loop();
+    g.menu();
 
     cout << "Crash experienced is the fault of SFML, sorry" << endl;
 

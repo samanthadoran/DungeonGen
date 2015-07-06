@@ -8,13 +8,13 @@
 
 class NPC : public Actor {
 public:
-    Actor *target;
-
-    NPC(sf::Vector2f, string, Actor *);
+    NPC(sf::Vector2f, string);
 
     void act(Actor *);
 
     void control();
+
+    void setTarget(Actor *);
 
     double attack(Entity *);
 
@@ -24,6 +24,7 @@ public:
 
 protected:
 private:
+    Actor *target;
 };
 
 #endif // NPC_H

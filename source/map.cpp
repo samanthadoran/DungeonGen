@@ -89,8 +89,8 @@ bool Map::inBounds(sf::Vector2f test) const {
     return true;
 }
 
-vector<vector<Tile *>> Map::getMap() const {
-    return tiles;
+vector<vector<Tile *>> *Map::getMap() {
+    return &tiles;
 }
 
 //What was I even doing?
@@ -394,11 +394,15 @@ const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
 }
 
 Map::~Map() {
-    //cout << "Map destructor..." << endl;
-    //for(int i = 0; i < textures.size(); ++i)
-    //    delete textures[i];
+    for (int i = 0; i < textures.size(); ++i) {
+        delete textures[i];
+        textures[i] = nullptr;
+    }
 
-    //for(int j = 0; j < tiles.size(); ++j)
-    //    for(int k = 0; k < tiles[j].size(); ++k)
-    //        delete tiles[j][k];
+    for (int j = 0; j < tiles.size(); ++j) {
+        for (int k = 0; k < tiles[j].size(); ++k) {
+            delete tiles[j][k];
+            tiles[j][k] = nullptr;
+        }
+    }
 }

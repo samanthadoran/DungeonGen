@@ -2,6 +2,7 @@
 #define ACTOR_H
 
 class Item;
+
 #include "entity.h"
 #include <vector>
 

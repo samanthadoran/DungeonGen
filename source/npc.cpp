@@ -1,8 +1,12 @@
 #include "../include/npc.h"
 
-NPC::NPC(sf::Vector2f pos, string filename, Actor *target) : Actor(pos, 0, filename, "Player") {
-    this->target = target;
+NPC::NPC(sf::Vector2f pos, string filename) : Actor(pos, 0, filename, "Player") {
+    target = nullptr;
     srand(time(0));
+}
+
+void NPC::setTarget(Actor *a) {
+    target = a;
 }
 
 void NPC::act(Actor *a) {
@@ -46,5 +50,6 @@ std::string NPC::toString() const {
 }
 
 NPC::~NPC() {
+    target = nullptr;
     //dtor
 }

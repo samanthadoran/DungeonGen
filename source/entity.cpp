@@ -1,4 +1,5 @@
 #include "../include/entity.h"
+
 int Entity::nextUUID = -1;
 
 Entity::Entity(sf::Vector2f pos, string filename) {

@@ -16,12 +16,16 @@ class Game {
 public:
     Game();
 
-    void loop();
+    void menu();
 
     virtual ~Game();
 
 protected:
 private:
+    void init();
+
+    void loop();
+
     sf::Vector2f tileToWorldCoord(sf::Vector2i) const;
 
     sf::Vector2i worldToTileCoord(sf::Vector2f) const;
@@ -46,7 +50,7 @@ private:
     int floor;
     bool gameOver;
 
-    Dungeon d;
+    Dungeon *d;
     Player *player;
     vector<Actor *> actors;
 

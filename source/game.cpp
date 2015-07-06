@@ -5,18 +5,6 @@ using namespace std;
 //TODO: Consider taking dungeon and instance specific logic out of constructor to allow easy reuse.
 
 Game::Game() {
-    gameOver = false;
-    selectedTile = nullptr;
-    floor = 0;
-    d = Dungeon(78, 78);
-    actors.emplace_back(new Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png"));
-    player = dynamic_cast<Player *>(actors.back());
-
-    //TODO: Generate items and equipment
-
-    music.openFromFile("music.ogg");
-    music.setLoop(true);
-
     //Creating our window
     app.create(sf::VideoMode(1440, 900), "Dungeon Generator");
 
@@ -36,6 +24,7 @@ Game::Game() {
     //to toggle debug output
     debug = true;
     focus = true;
+    d = nullptr;
 }
 
 void Game::runEvents() {
@@ -72,18 +61,19 @@ void Game::runEvents() {
                     debug = !debug;
                     break;
                 case sf::Keyboard::F5:
-                    d.saveDungeon("default.txt");
+                    d->saveDungeon("default.txt");
                     break;
                 case sf::Keyboard::F9:
-                    d = Dungeon("default.txt");
+                    delete d;
+                    d = new Dungeon("default.txt");
                     floor = 0;
                     if (player == nullptr) {
                         actors.emplace(actors.begin(),
-                                       new Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160,
+                                       new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 160,
                                                   "link.png"));
                         player = dynamic_cast<Player *>(actors.front());
                     }
-                    player->setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+                    player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
                     break;
                 case sf::Keyboard::M:
                     if (music.getVolume() == 0)
@@ -106,32 +96,34 @@ sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const
 
     future.left += movement.x * elapsed.asSeconds();
     futurePos = sf::Vector2f(future.left, future.top);
-    if (!d.getFloor(floor).inBounds(futurePos)) {
+    if (!d->getFloor(floor)->inBounds(futurePos)) {
         movement.x = 0;
     }
 
-    for (auto row: d.getFloor(floor).getMap())
+    for (auto row: *d->getFloor(floor)->getMap())
         for (auto tile: row)
-            if (tile->getTileType() == TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
+            if (tile->getTileType() ==
+                TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
                 movement.x = 0;
 
     future = test;
     future.top += movement.y * elapsed.asSeconds();
     futurePos = sf::Vector2f(future.left, future.top);
-    if (!d.getFloor(floor).inBounds(futurePos)) {
+    if (!d->getFloor(floor)->inBounds(futurePos)) {
         movement.y = 0;
     }
 
-    for (auto row: d.getFloor(floor).getMap())
+    for (auto row: *d->getFloor(floor)->getMap())
         for (auto tile: row)
-            if (tile->getTileType() == TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
+            if (tile->getTileType() ==
+                TileType::WALL) if (tile->getGraphicalRepresentation().getGlobalBounds().intersects(future))
                 movement.y = 0;
 
     return movement;
 }
 
 void Game::runTileEvent(Player *p) {
-    const Tile *t = d.getFloor(floor).getTileAtPos(worldToTileCoord(p->getPosition()));
+    const Tile *t = d->getFloor(floor)->getTileAtPos(worldToTileCoord(p->getPosition()));
     TileType type = t->getTileType();
 
     switch (type) {
@@ -140,34 +132,55 @@ void Game::runTileEvent(Player *p) {
                 app.close();
             else {
                 --floor;
-                p->setPosition(tileToWorldCoord(d.getFloor(floor).getStairsDownSpawn()));
+                p->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsDownSpawn()));
             }
             break;
         case TileType::STAIRS_DOWN:
-            if (d.getFloors().size() == floor + 1)
-                d.addFloor();
+            if (d->getFloors().size() == floor + 1)
+                d->addFloor();
 
             ++floor;
-            p->setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+            p->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
             break;
         default:
             break;
     }
 }
 
-void Game::loop() {
-    bool pressed = false;
-    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
+void Game::init() {
+    gameOver = false;
+    selectedTile = nullptr;
+    floor = 0;
 
-    actors.emplace_back(new NPC(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png", player));
+    //TODO: Generate items and equipment
+    d = new Dungeon(78, 78);
+
+    music.openFromFile("music.ogg");
+    music.setLoop(true);
+
+    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 160, "link.png"));
+    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
+
+    player = dynamic_cast<Player *>(actors.front());
+    dynamic_cast<NPC *>(actors.back())->setTarget(player);
+
     actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
-
-    sf::Clock textclk;
-    textclk.restart();
+    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
 
     //Start the game loop
     music.setVolume(20);
     music.play();
+}
+
+void Game::menu() {
+    init();
+    loop();
+}
+
+void Game::loop() {
+
+    sf::Clock textclk;
+    textclk.restart();
 
     while (app.isOpen()) {
         elapsed = clk.restart();
@@ -183,11 +196,12 @@ void Game::loop() {
                 if (dynamic_cast<Player *>(*i)) {
                     *i = nullptr;
                     gameOver = true;
+                    player = nullptr;
                 }
 
                 delete *i;
                 *i = nullptr;
-                i = actors.erase(i);
+                actors.erase(i);
                 if (actors.empty())
                     break;
                 i = actors.begin();
@@ -207,10 +221,11 @@ void Game::loop() {
         sf::View currView = app.getView();
         currView.setCenter(player->getPosition());
         app.setView(currView);
-        sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2), app.getView().getCenter().y - (currView.getSize().y / 2));
+        sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2),
+                              app.getView().getCenter().y - (currView.getSize().y / 2));
 
         //Draw the map to the screen
-        for (auto j: d.getFloor(floor).getMap())
+        for (auto j: *d->getFloor(floor)->getMap())
             for (auto k: j)
                 app.draw(k->getGraphicalRepresentation());
 
@@ -247,7 +262,7 @@ void Game::loop() {
         // Update the window
         app.display();
     }
-
+    delete d;
 
 }
 
@@ -297,8 +312,8 @@ const Tile *const Game::selectTile() {
         sf::Vector2f tilePos = app.mapPixelToCoords(sf::Mouse::getPosition(app));
 
         //If the mouse is inbounds on the selected floor, return the tile at its position
-        if (d.getFloor(floor).inBounds(tilePos))
-            return d.getFloor(floor).getTileAtPos(tilePos);
+        if (d->getFloor(floor)->inBounds(tilePos))
+            return d->getFloor(floor)->getTileAtPos(tilePos);
     }
 
     //The user wasn't trying to select a tile.
@@ -341,13 +356,17 @@ void Game::drawTileOutline(Tile *t) {
 void Game::drawMinimap() {
     sf::View standard = app.getView();
     unsigned int size = 400; // The 'minimap' view will show a smaller picture of the map
-    sf::View minimap(sf::FloatRect(standard.getCenter().x, standard.getCenter().y, static_cast<float>(size), static_cast<float>(app.getSize().y * size / app.getSize().x)));
-    minimap.setViewport(sf::FloatRect(1.f - static_cast<float>(minimap.getSize().x) / app.getSize().x - 0.02f, 1.f - static_cast<float>(minimap.getSize().y) / app.getSize().y - 0.02f, static_cast<float>(minimap.getSize().x) / app.getSize().x, static_cast<float>(minimap.getSize().y) / app.getSize().y));
+    sf::View minimap(sf::FloatRect(standard.getCenter().x, standard.getCenter().y, static_cast<float>(size),
+                                   static_cast<float>(app.getSize().y * size / app.getSize().x)));
+    minimap.setViewport(sf::FloatRect(1.f - static_cast<float>(minimap.getSize().x) / app.getSize().x - 0.02f,
+                                      1.f - static_cast<float>(minimap.getSize().y) / app.getSize().y - 0.02f,
+                                      static_cast<float>(minimap.getSize().x) / app.getSize().x,
+                                      static_cast<float>(minimap.getSize().y) / app.getSize().y));
     minimap.zoom(8.f);
     app.setView(minimap);
 
     //Draw the minimap to the screen
-    for (auto row: d.getFloor(floor).getMap())
+    for (auto row: *d->getFloor(floor)->getMap())
         for (auto tile: row)
             app.draw(tile->getGraphicalRepresentation());
     app.setView(standard);
@@ -369,8 +388,10 @@ void Game::showText(string s, sf::Vector2f pos) {
 
 string Game::updateDebug() {
     stringstream info;
-    info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
+    info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " <<
+    (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
+
     if (player != nullptr)
         info << "\n" << player->toString();
     else
@@ -382,8 +403,10 @@ string Game::updateDebug() {
 }
 
 Game::~Game() {
-    /*for (auto &e: entities) {
-        delete e;
-        e = nullptr;
-    }*/
+    for (int i = 0; i < actors.size(); ++i) {
+        delete actors[i];
+        actors[i] = nullptr;
+    }
+    delete d;
+    delete player;
 }

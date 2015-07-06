@@ -19,9 +19,9 @@ public:
     //Load a dungeon from a file
     Dungeon(string);
 
-    vector<Map> getFloors() const;
+    vector<Map *> getFloors() const;
 
-    Map getFloor(int) const;
+    Map *getFloor(int) const;
 
     void addFloor();
 
@@ -32,7 +32,7 @@ public:
 protected:
 private:
     int x, y;
-    vector<Map> floors;
+    vector<Map *> floors;
 };
 
 #endif // DUNGEON_H

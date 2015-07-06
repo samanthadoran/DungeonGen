@@ -32,13 +32,13 @@ public:
 
     bool inBounds(sf::Vector2f) const;
 
-    string getTextualRepresentation()const;
+    string getTextualRepresentation() const;
 
     int getWidth() const;
 
     int getHeight() const;
 
-    vector<vector<Tile *>> getMap() const;
+    vector<vector<Tile *>> *getMap();
 
     sf::Vector2i getStairsUpSpawn() const;
 

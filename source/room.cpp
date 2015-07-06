@@ -69,9 +69,9 @@ bool Room::intersectsRoom(Room r) const {
     return (this->getX() <= r.getX() + r.getWidth()
             &&
             r.getX() <= this->getX() + this->getWidth()
-                    &&
+            &&
             this->getY() <= r.getY() + r.getLength()
-                    &&
+            &&
             r.getY() <= this->getY() + this->length
     );
 }
