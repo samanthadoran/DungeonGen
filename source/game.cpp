@@ -2,13 +2,17 @@
 
 using namespace std;
 
+//TODO: Consider taking dungeon and instance specific logic out of constructor to allow easy reuse.
+
 Game::Game() {
+    gameOver = false;
     selectedTile = nullptr;
     floor = 0;
     d = Dungeon(78, 78);
-    player = Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png");
+    actors.emplace_back(new Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160, "link.png"));
+    player = dynamic_cast<Player *>(actors.back());
+
     //TODO: Generate items and equipment
-    //TODO: Fix NPCs
 
     music.openFromFile("music.ogg");
     music.setLoop(true);
@@ -73,7 +77,13 @@ void Game::runEvents() {
                 case sf::Keyboard::F9:
                     d = Dungeon("default.txt");
                     floor = 0;
-                    player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
+                    if (player == nullptr) {
+                        actors.emplace(actors.begin(),
+                                       new Player(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), 160,
+                                                  "link.png"));
+                        player = dynamic_cast<Player *>(actors.front());
+                    }
+                    player->setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
                     break;
                 case sf::Keyboard::M:
                     if (music.getVolume() == 0)
@@ -147,16 +157,10 @@ void Game::runTileEvent(Player *p) {
 
 void Game::loop() {
     bool pressed = false;
-    Map currMap = d.getFloor(floor);
-    NPC testnpc(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png", &currMap);
-    testnpc.target = &player;
-    player.addItem(new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1, 200));
-    testnpc.addItem(new Item(sf::Vector2f(-1, -1), "link.png", "fists", -1, 200));
-    entities.push_back(&player);
-    actors.push_back(&player);
-    entities.push_back(&testnpc);
-    actors.push_back(&testnpc);
+    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
 
+    actors.emplace_back(new NPC(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()), "link.png", player));
+    actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
 
     sf::Clock textclk;
     textclk.restart();
@@ -174,17 +178,34 @@ void Game::loop() {
         //Check for application events.
         runEvents();
 
-        for (auto e: actors) {
-            e->control();
-            e->setVelocity(collisions(e->getCollisionAABB().getGlobalBounds(), e->getVelocity()));
-            e->update(elapsed);
+        for (auto i = actors.begin(); i != actors.end(); ++i)
+            if (!(*i)->isAlive()) {
+                if (dynamic_cast<Player *>(*i)) {
+                    *i = nullptr;
+                    gameOver = true;
+                }
+
+                delete *i;
+                *i = nullptr;
+                i = actors.erase(i);
+                if (actors.empty())
+                    break;
+                i = actors.begin();
+            }
+        if (gameOver)
+            break;
+
+        for (auto a: actors) {
+            a->control();
+            a->setVelocity(collisions(a->getCollisionAABB().getGlobalBounds(), a->getVelocity()));
+            a->update(elapsed);
         }
 
-        runTileEvent(&player);
+        runTileEvent(player);
 
         //Get & Update the camera
         sf::View currView = app.getView();
-        currView.setCenter(player.getPosition());
+        currView.setCenter(player->getPosition());
         app.setView(currView);
         sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2), app.getView().getCenter().y - (currView.getSize().y / 2));
 
@@ -204,12 +225,12 @@ void Game::loop() {
         //Show the user where they are clicking and act on entities within that square
         if (selectedTile != nullptr) {
             drawTileOutline(selectedTile);
-            if (getTileActors(selectedTile) != nullptr)
-                player.act(getTileActors(selectedTile));
+            if (getTileActors(selectedTile) != nullptr && player != nullptr)
+                player->act(getTileActors(selectedTile));
         }
 
-        for (auto e: entities)
-            app.draw(e->getSprite());
+        for (auto a: actors)
+            app.draw(a->getSprite());
 
         for (auto a: actors)
             app.draw(a->getHealthBar());
@@ -226,6 +247,8 @@ void Game::loop() {
         // Update the window
         app.display();
     }
+
+
 }
 
 sf::Vector2f Game::tileToWorldCoord(sf::Vector2i toConv) const {
@@ -282,7 +305,7 @@ const Tile *const Game::selectTile() {
     return nullptr;
 }
 
-//TODO: Shadow don't draw well, work on it
+//TODO: Shadows don't draw well, work on it
 void Game::drawShadows(Entity *focus) {
     sf::RenderTexture darkness;
     darkness.create(app.getSize().x, app.getSize().y);
@@ -348,7 +371,10 @@ string Game::updateDebug() {
     stringstream info;
     info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " << (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
-    info << "\n" << player.toString();
+    if (player != nullptr)
+        info << "\n" << player->toString();
+    else
+        info << "\n" << "Player is dead!";
 
     debugText = info.str();
 
@@ -356,8 +382,8 @@ string Game::updateDebug() {
 }
 
 Game::~Game() {
-    for (auto &e: entities) {
+    /*for (auto &e: entities) {
         delete e;
         e = nullptr;
-    }
+    }*/
 }

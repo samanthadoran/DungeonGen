@@ -11,6 +11,8 @@ using std::vector;
 
 class Room {
 public:
+    Room();
+
     Room(int, int, int, int);
 
     void initRoom();

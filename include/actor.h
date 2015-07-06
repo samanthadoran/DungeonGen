@@ -10,9 +10,9 @@ using std::vector;
 
 class Actor : public Entity {
 public:
-    Actor(int, int, string, string);
+    Actor(int, int, int, string, string);
 
-    Actor(sf::Vector2f, string, string);
+    Actor(sf::Vector2f, int, string, string);
 
     virtual void control() = 0;
 

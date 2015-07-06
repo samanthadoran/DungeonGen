@@ -82,7 +82,11 @@ void Map::render() {
 
 //Tests whether or not a point lies within the bounds of the map.
 bool Map::inBounds(sf::Vector2f test) const {
-    return getTileAtPos(test) != nullptr;
+    if (test.x < 0 || test.x > width * 32)
+        return false;
+    if (test.y < 0 || test.y > height * 32)
+        return false;
+    return true;
 }
 
 vector<vector<Tile *>> Map::getMap() const {
@@ -390,6 +394,7 @@ const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
 }
 
 Map::~Map() {
+    //cout << "Map destructor..." << endl;
     //for(int i = 0; i < textures.size(); ++i)
     //    delete textures[i];
 

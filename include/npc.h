@@ -10,9 +10,9 @@ class NPC : public Actor {
 public:
     Actor *target;
 
-    NPC(int, int, string, Map *);
+    NPC(int, int, string, Actor *);
 
-    NPC(sf::Vector2f, string, Map *);
+    NPC(sf::Vector2f, string, Actor *);
 
     void act(Actor *);
 
@@ -26,7 +26,6 @@ public:
 
 protected:
 private:
-    Map *m;
 };
 
 #endif // NPC_H

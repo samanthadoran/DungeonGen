@@ -9,7 +9,7 @@ using std::string;
 
 class Item : public Actor {
 public:
-    Item(sf::Vector2f, string, string, int, int);
+    Item(sf::Vector2f, int, string, string, int, int);
 
     string toString() const;
 

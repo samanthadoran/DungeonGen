@@ -91,5 +91,4 @@ void Dungeon::saveDungeon(string filename) const {
 }
 
 Dungeon::~Dungeon() {
-
 }

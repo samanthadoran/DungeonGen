@@ -44,11 +44,10 @@ private:
 
     Tile *selectedTile;
     int floor;
-
+    bool gameOver;
 
     Dungeon d;
-    Player player;
-    vector<Entity *> entities;
+    Player *player;
     vector<Actor *> actors;
 
     void runEvents();

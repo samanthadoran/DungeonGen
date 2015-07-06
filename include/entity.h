@@ -25,6 +25,10 @@ public:
 
     void setPosition(sf::Vector2i);
 
+    void kill();
+
+    bool isAlive() const;
+
     unsigned int getUUID() const;
 
     sf::Sprite getSprite() const;
@@ -43,6 +47,8 @@ protected:
 private:
     unsigned int UUID;
     static int nextUUID;
+
+    bool alive;
 
     sf::Vector2f position;
     sf::Vector2f velocity;

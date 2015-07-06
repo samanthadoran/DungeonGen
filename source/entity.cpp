@@ -1,28 +1,37 @@
 #include "../include/entity.h"
-
 int Entity::nextUUID = -1;
 
 Entity::Entity(int x, int y, string filename) {
+    alive = true;
     ++Entity::nextUUID;
     UUID = Entity::nextUUID;
     tex.loadFromFile(filename);
     m_sprite.setTexture(tex);
+    m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
 
     collision = sf::RectangleShape(sf::Vector2f(12, 8));
-    collision.setPosition(position.x + 3, position.y + (26 - 8 - 1));
+    collision.setOrigin(collision.getLocalBounds().width / 2.0f, collision.getLocalBounds().height / 2.0f);
+    collision.setPosition(sf::Vector2f(x, y));
 
     position = sf::Vector2f(x, y);
     velocity = sf::Vector2f(0, 0);
 }
 
 Entity::Entity(sf::Vector2f pos, string filename) {
+    alive = true;
     ++Entity::nextUUID;
     UUID = Entity::nextUUID;
     tex.loadFromFile(filename);
     m_sprite.setTexture(tex);
+    m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
 
     collision = sf::RectangleShape(sf::Vector2f(12, 8));
-    collision.setPosition(position.x + 3, position.y + (26 - 8 - 1));
+    collision.setOrigin(collision.getLocalBounds().width / 2.0f, collision.getLocalBounds().height / 2.0f);
+    collision.setPosition(pos);
+
+    collision = sf::RectangleShape(sf::Vector2f(12, 8));
+    //collision.setPosition(position.x + 3, position.y + (26 - 8 - 1));
+    collision.setPosition(pos);
 
     position = pos;
     velocity = sf::Vector2f(0, 0);
@@ -32,10 +41,18 @@ sf::RectangleShape Entity::getCollisionAABB() const {
     return collision;
 }
 
+void Entity::kill() {
+    alive = false;
+}
+
+bool Entity::isAlive() const {
+    return alive;
+}
+
 void Entity::update(sf::Time elapsed) {
     position += velocity * elapsed.asSeconds();
     m_sprite.setPosition(position);
-    collision.setPosition(position.x + 3, position.y + (26 - 8 - 1));
+    collision.setPosition(position);
     velocity = sf::Vector2f(0, 0);
 }
 

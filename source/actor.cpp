@@ -1,26 +1,32 @@
 #include "../include/actor.h"
 
-Actor::Actor(int x, int y, string filename, string name) : Entity(x, y, filename) {
+Actor::Actor(int x, int y, int damage, string filename, string name) : Entity(x, y, filename) {
     healthBar = sf::RectangleShape(sf::Vector2f(24, 4));
     healthBar.setFillColor(sf::Color::Green);
+    healthBar.setOrigin(healthBar.getSize() / 2.0f);
     healthBar.setPosition(getPosition());
-    damage = 1;
+    this->damage = damage;
     this->name = name;
     hp = 100;
 }
 
-Actor::Actor(sf::Vector2f pos, string filename, string name) : Entity(pos, filename) {
+Actor::Actor(sf::Vector2f pos, int damage, string filename, string name) : Entity(pos, filename) {
     healthBar = sf::RectangleShape(sf::Vector2f(24, 4));
     healthBar.setFillColor(sf::Color::Green);
+    healthBar.setOrigin(healthBar.getSize() / 2.0f);
     healthBar.setPosition(getPosition());
-    damage = 1;
+    this->damage = damage;
     this->name = name;
     hp = 100;
 }
 
 void Actor::update(sf::Time elapsed) {
     Entity::update(elapsed);
-    healthBar.setPosition(getPosition());
+
+    if (hp < 0)
+        kill();
+
+    healthBar.setPosition(getPosition() - sf::Vector2f(0, 13));
 }
 
 vector<Actor *> Actor::getItems() const {

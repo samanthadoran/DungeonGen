@@ -1,22 +1,27 @@
 #include "../include/npc.h"
 
-NPC::NPC(int x, int y, string filename, Map *map) : Actor(x, y, filename, "Player") {
-    m = map;
+NPC::NPC(int x, int y, string filename, Actor *target) : Actor(x, y, 0, filename, "Player") {
+    this->target = target;
     srand(time(0));
 }
 
-NPC::NPC(sf::Vector2f pos, string filename, Map *map) : Actor(pos, filename, "Player") {
-    m = map;
+NPC::NPC(sf::Vector2f pos, string filename, Actor *target) : Actor(pos, 0, filename, "Player") {
+    this->target = target;
     srand(time(0));
 }
 
 void NPC::act(Actor *a) {
+    if (getItems().empty())
+        return;
     Actor *item = getItems().back();
     item->act(a);
 }
 
 void NPC::control() {
     //Check distance
+    if (target == nullptr)
+        return;
+
     sf::Vector2f dist = getPosition() - target->getPosition();
 
     //Don't move about if the target is too far
