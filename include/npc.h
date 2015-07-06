@@ -10,8 +10,6 @@ class NPC : public Actor {
 public:
     Actor *target;
 
-    NPC(int, int, string, Actor *);
-
     NPC(sf::Vector2f, string, Actor *);
 
     void act(Actor *);

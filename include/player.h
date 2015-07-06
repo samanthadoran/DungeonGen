@@ -12,8 +12,6 @@ class Player : public Actor {
 public:
     Player();
 
-    Player(int, int, int, string);
-
     Player(sf::Vector2f, int, string);
 
     void act(Actor *);

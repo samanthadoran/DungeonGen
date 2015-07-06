@@ -1,15 +1,5 @@
 #include "../include/actor.h"
 
-Actor::Actor(int x, int y, int damage, string filename, string name) : Entity(x, y, filename) {
-    healthBar = sf::RectangleShape(sf::Vector2f(24, 4));
-    healthBar.setFillColor(sf::Color::Green);
-    healthBar.setOrigin(healthBar.getSize() / 2.0f);
-    healthBar.setPosition(getPosition());
-    this->damage = damage;
-    this->name = name;
-    hp = 100;
-}
-
 Actor::Actor(sf::Vector2f pos, int damage, string filename, string name) : Entity(pos, filename) {
     healthBar = sf::RectangleShape(sf::Vector2f(24, 4));
     healthBar.setFillColor(sf::Color::Green);

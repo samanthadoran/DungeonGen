@@ -1,10 +1,5 @@
 #include "../include/npc.h"
 
-NPC::NPC(int x, int y, string filename, Actor *target) : Actor(x, y, 0, filename, "Player") {
-    this->target = target;
-    srand(time(0));
-}
-
 NPC::NPC(sf::Vector2f pos, string filename, Actor *target) : Actor(pos, 0, filename, "Player") {
     this->target = target;
     srand(time(0));

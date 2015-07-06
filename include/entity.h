@@ -13,8 +13,6 @@ public:
 
     virtual std::string toString() const = 0;
 
-    Entity(int, int, string);
-
     Entity(sf::Vector2f, string);
 
     void update(sf::Time);
