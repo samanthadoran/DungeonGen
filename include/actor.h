@@ -20,6 +20,8 @@ public:
 
     virtual void act(Actor *) = 0;
 
+    void update(sf::Time);
+
     double getHP() const;
 
     void setHP(double);
@@ -28,6 +30,8 @@ public:
 
     vector<Actor *> getItems() const;
 
+    sf::RectangleShape getHealthBar() const;
+
     string getName() const;
 
     void addItem(Actor *);
@@ -35,6 +39,7 @@ public:
     virtual ~Actor();
 
 private:
+    sf::RectangleShape healthBar;
     vector<Actor *> items;
     string name;
     double damage;

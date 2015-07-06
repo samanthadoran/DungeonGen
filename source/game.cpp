@@ -75,6 +75,12 @@ void Game::runEvents() {
                     floor = 0;
                     player.setPosition(tileToWorldCoord(d.getFloor(floor).getStairsUpSpawn()));
                     break;
+                case sf::Keyboard::M:
+                    if (music.getVolume() == 0)
+                        music.setVolume(20);
+                    else
+                        music.setVolume(0);
+                    break;
                 default:
                     break;
             }
@@ -156,6 +162,7 @@ void Game::loop() {
     textclk.restart();
 
     //Start the game loop
+    music.setVolume(20);
     music.play();
 
     while (app.isOpen()) {
@@ -194,6 +201,7 @@ void Game::loop() {
 
         selectedTile = (Tile *) (selectTile());
 
+        //Show the user where they are clicking and act on entities within that square
         if (selectedTile != nullptr) {
             drawTileOutline(selectedTile);
             if (getTileActors(selectedTile) != nullptr)
@@ -202,6 +210,9 @@ void Game::loop() {
 
         for (auto e: entities)
             app.draw(e->getSprite());
+
+        for (auto a: actors)
+            app.draw(a->getHealthBar());
 
         //Update the debug info every second
         if (textclk.getElapsedTime().asSeconds() >= 1) {
@@ -239,6 +250,8 @@ sf::Vector2i Game::worldToTileCoord(sf::Vector2i pos) const {
     return newPos;
 }
 
+//Return actors at the given tile
+//TODO: Currently only returns one actor
 Actor *Game::getTileActors(Tile *t) {
     //There isn't a tile here.
     if (t == nullptr)
@@ -254,28 +267,35 @@ Actor *Game::getTileActors(Tile *t) {
     return nullptr;
 }
 
+//Return a pointer to the tile at the user's mouse
 const Tile *const Game::selectTile() {
+    //Is the user trying to select a tile?
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
         sf::Vector2f tilePos = app.mapPixelToCoords(sf::Mouse::getPosition(app));
+
+        //If the mouse is inbounds on the selected floor, return the tile at its position
         if (d.getFloor(floor).inBounds(tilePos))
             return d.getFloor(floor).getTileAtPos(tilePos);
     }
+
+    //The user wasn't trying to select a tile.
     return nullptr;
 }
 
+//TODO: Shadow don't draw well, work on it
 void Game::drawShadows(Entity *focus) {
     sf::RenderTexture darkness;
     darkness.create(app.getSize().x, app.getSize().y);
     darkness.clear(sf::Color(100, 100, 100));
 
     sf::CircleShape light(60);
-    light.setOrigin(sf::Vector2f(light.getRadius() / 2.0, light.getRadius() / 2.0));
-    light.setPosition(app.getSize().x / 2.0 - 20, app.getSize().y / 2.0 - 40);
+    light.setOrigin(sf::Vector2f(light.getRadius() / 2.0f, light.getRadius() / 2.0f));
+    light.setPosition(app.getSize().x / 2.0f - 20, app.getSize().y / 2.0f - 40);
     light.setFillColor(sf::Color(255, 255, 255, 200));
     darkness.draw(light, sf::BlendAdd);
 
     sf::Sprite helper(darkness.getTexture());
-    helper.setOrigin(helper.getLocalBounds().width / 2.0, helper.getLocalBounds().height / 2.0);
+    helper.setOrigin(helper.getLocalBounds().width / 2.0f, helper.getLocalBounds().height / 2.0f);
     helper.setPosition(focus->getPosition());
 
     app.draw(helper, sf::BlendMultiply);
@@ -285,7 +305,7 @@ void Game::drawTileOutline(Tile *t) {
     sf::RectangleShape outline = sf::RectangleShape(sf::Vector2f(32.0, 32.0));
 
     //IMPORTANT: Tile accesses are reflected over y = x! so remember, swap x and y!
-    sf::Vector2f outlinePos = tileToWorldCoord(selectedTile->getPos());
+    sf::Vector2f outlinePos = tileToWorldCoord(t->getPos());
 
     outline.setPosition(outlinePos);
     outline.setFillColor(sf::Color::Transparent);
@@ -304,12 +324,13 @@ void Game::drawMinimap() {
     app.setView(minimap);
 
     //Draw the minimap to the screen
-    for (auto j: d.getFloor(floor).getMap())
-        for (auto k: j)
-            app.draw(k->getGraphicalRepresentation());
+    for (auto row: d.getFloor(floor).getMap())
+        for (auto tile: row)
+            app.draw(tile->getGraphicalRepresentation());
     app.setView(standard);
 }
 
+//Show supplied text at supplied position
 void Game::showText(string s, sf::Vector2f pos) {
     sf::Text t;
     t = sf::Text("", font);

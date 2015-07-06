@@ -137,5 +137,6 @@ void Tile::setTileType(TileType t) {
 }
 
 Tile::~Tile() {
+    textures = nullptr;
     //dtor
 }

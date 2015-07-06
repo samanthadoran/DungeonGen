@@ -390,4 +390,10 @@ const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
 }
 
 Map::~Map() {
+    //for(int i = 0; i < textures.size(); ++i)
+    //    delete textures[i];
+
+    //for(int j = 0; j < tiles.size(); ++j)
+    //    for(int k = 0; k < tiles[j].size(); ++k)
+    //        delete tiles[j][k];
 }
