@@ -15,7 +15,6 @@ Entity::Entity(sf::Vector2f pos, string filename) {
     collision.setPosition(pos);
 
     collision = sf::RectangleShape(sf::Vector2f(12, 8));
-    //collision.setPosition(position.x + 3, position.y + (26 - 8 - 1));
     collision.setPosition(pos);
 
     position = pos;

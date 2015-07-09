@@ -2,6 +2,7 @@
 
 Item::Item(sf::Vector2f pos, int damage, string filename, string name, int uses, int reUse) : Actor(pos, damage,
                                                                                                     filename, name) {
+    setHP(uses);
     coolDown = reUse;
     //ctor
 }

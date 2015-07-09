@@ -18,8 +18,6 @@ class Tile {
 public:
     Tile(vector<sf::Texture *> *, int, int, TileType = TileType::BLANK);
 
-    Tile(vector<sf::Texture *> *, sf::Vector2i, TileType = TileType::BLANK);
-
     TileType getTileType() const;
 
     sf::Vector2i getPos() const;

@@ -8,8 +8,10 @@
 #include "npc.h"
 #include "dungeon.h"
 #include "map.h"
+#include "state.h"
 
 #include <sstream>
+#include <stack>
 #include <SFML/Audio.hpp>
 
 class Game {
@@ -23,6 +25,10 @@ public:
 protected:
 private:
     void init();
+
+    void update();
+
+    void render();
 
     void loop();
 
@@ -53,6 +59,7 @@ private:
     Dungeon *d;
     Player *player;
     vector<Actor *> actors;
+    stack<State> states;
 
     void runEvents();
 
@@ -72,6 +79,7 @@ private:
     string debugText;
     sf::Font font;
     sf::Clock clk;
+    sf::Clock textclk;
 
     sf::Time elapsed;
 };

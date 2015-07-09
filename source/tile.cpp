@@ -24,37 +24,6 @@ Tile::Tile(vector<sf::Texture *> *tex, int x, int y, TileType t) :
         case TileType::STAIRS_UP:
             r.setTexture((*textures)[3]);
             break;
-        default:
-            break;
-    }
-}
-
-Tile::Tile(vector<sf::Texture *> *tex, sf::Vector2i p, TileType t) :
-        type(t) {
-    textures = tex;
-    pos = p;
-
-    r.setSize(sf::Vector2f(32, 32));
-    r.setPosition(sf::Vector2f(pos.y * 32, pos.x * 32));
-
-    switch (type) {
-        case TileType::BLANK:
-            r.setFillColor(sf::Color::Black);
-            break;
-        case TileType::FLOOR:
-            r.setTexture((*textures)[0]);
-            break;
-        case TileType::WALL:
-            r.setTexture((*textures)[1]);
-            break;
-        case TileType::STAIRS_DOWN:
-            r.setTexture((*textures)[2]);
-            break;
-        case TileType::STAIRS_UP:
-            r.setTexture((*textures)[3]);
-            break;
-        default:
-            break;
     }
 }
 
@@ -91,8 +60,6 @@ char Tile::getTextualRepresentation() const {
             return 'U';
         case TileType::STAIRS_DOWN:
             return 'D';
-        default:
-            return '?';
     }
 }
 
@@ -130,8 +97,6 @@ void Tile::setTileType(TileType t) {
             break;
         case TileType::STAIRS_UP:
             r.setTexture((*textures)[3]);
-            break;
-        default:
             break;
     }
 }

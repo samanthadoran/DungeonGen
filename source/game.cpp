@@ -2,8 +2,6 @@
 
 using namespace std;
 
-//TODO: Consider taking dungeon and instance specific logic out of constructor to allow easy reuse.
-
 Game::Game() {
     //Creating our window
     app.create(sf::VideoMode(1440, 900), "Dungeon Generator");
@@ -24,18 +22,19 @@ Game::Game() {
     //to toggle debug output
     debug = true;
     focus = true;
+
     d = nullptr;
 }
 
+// Process events thrown by sfml
 void Game::runEvents() {
-    // Process events
     sf::Event event;
     while (app.pollEvent(event)) {
         if (event.type == sf::Event::Resized) {
             // update the view to the new size of the window
             sf::FloatRect newView(0, 0, event.size.width, event.size.height);
-            newView.left = app.getView().getCenter().x - app.getView().getSize().x / 2.0;
-            newView.top = app.getView().getCenter().y - app.getView().getSize().y / 2.0;
+            newView.left = app.getView().getCenter().x - app.getView().getSize().x / 2.0f;
+            newView.top = app.getView().getCenter().y - app.getView().getSize().y / 2.0f;
             app.setView(sf::View(newView));
         }
 
@@ -122,6 +121,7 @@ sf::Vector2f Game::collisions(sf::Rect<float> test, sf::Vector2f movement) const
     return movement;
 }
 
+//TODO: Add more types of tile events.
 void Game::runTileEvent(Player *p) {
     const Tile *t = d->getFloor(floor)->getTileAtPos(worldToTileCoord(p->getPosition()));
     TileType type = t->getTileType();
@@ -147,6 +147,7 @@ void Game::runTileEvent(Player *p) {
     }
 }
 
+//Setup variables for this dungeon instance
 void Game::init() {
     gameOver = false;
     selectedTile = nullptr;
@@ -172,100 +173,112 @@ void Game::init() {
     music.play();
 }
 
+//TODO: Flesh out in a full menu class
 void Game::menu() {
     init();
     loop();
 }
 
-void Game::loop() {
+void Game::update() {
+    elapsed = clk.restart();
 
-    sf::Clock textclk;
+    //Check for application events.
+    runEvents();
+
+    for (auto i = actors.begin(); i != actors.end(); ++i) {
+        if (!(*i)->isAlive()) {
+            if (dynamic_cast<Player *>(*i)) {
+                *i = nullptr;
+                gameOver = true;
+                player = nullptr;
+            }
+
+            delete *i;
+            *i = nullptr;
+            actors.erase(i);
+            if (actors.empty())
+                break;
+            i = actors.begin();
+        }
+    }
+
+    for (auto a: actors) {
+        a->control();
+        a->setVelocity(collisions(a->getCollisionAABB().getGlobalBounds(), a->getVelocity()));
+        a->update(elapsed);
+    }
+
+    runTileEvent(player);
+
+    selectedTile = (Tile *) (selectTile());
+
+    //Show the user where they are clicking and act on entities within that square
+    if (selectedTile != nullptr) {
+        if (getTileActors(selectedTile) != nullptr && player != nullptr)
+            player->act(getTileActors(selectedTile));
+    }
+}
+
+void Game::render() {
+    app.clear();
+
+    //Get & Update the camera
+    sf::View currView = app.getView();
+    currView.setCenter(player->getPosition());
+    app.setView(currView);
+    sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2),
+                          app.getView().getCenter().y - (currView.getSize().y / 2));
+
+    //Draw the map to the screen
+    for (auto j: *d->getFloor(floor)->getMap())
+        for (auto k: j)
+            app.draw(k->getGraphicalRepresentation());
+
+    //Experimental shadow stuff
+    //drawShadows(&player);
+
+    //Experimental minimap stuff
+    drawMinimap();
+
+    selectedTile = (Tile *) (selectTile());
+
+    //Show the user where they are clicking and act on entities within that square
+    if (selectedTile != nullptr) {
+        drawTileOutline(selectedTile);
+    }
+
+    for (auto a: actors)
+        app.draw(a->getSprite());
+
+    for (auto a: actors)
+        app.draw(a->getHealthBar());
+
+    //Update the debug info every second
+    if (textclk.getElapsedTime().asSeconds() >= 1) {
+        updateDebug();
+        textclk.restart();
+    }
+
+    if (debug)
+        showText(debugText, debugPos);
+
+    //Update the window
+    app.display();
+}
+
+void Game::loop() {
     textclk.restart();
 
     while (app.isOpen()) {
-        elapsed = clk.restart();
-
-        //Clear screen
-        app.clear();
-
-        //Check for application events.
-        runEvents();
-
-        for (auto i = actors.begin(); i != actors.end(); ++i)
-            if (!(*i)->isAlive()) {
-                if (dynamic_cast<Player *>(*i)) {
-                    *i = nullptr;
-                    gameOver = true;
-                    player = nullptr;
-                }
-
-                delete *i;
-                *i = nullptr;
-                actors.erase(i);
-                if (actors.empty())
-                    break;
-                i = actors.begin();
-            }
-        if (gameOver)
-            break;
-
-        for (auto a: actors) {
-            a->control();
-            a->setVelocity(collisions(a->getCollisionAABB().getGlobalBounds(), a->getVelocity()));
-            a->update(elapsed);
-        }
-
-        runTileEvent(player);
-
-        //Get & Update the camera
-        sf::View currView = app.getView();
-        currView.setCenter(player->getPosition());
-        app.setView(currView);
-        sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2),
-                              app.getView().getCenter().y - (currView.getSize().y / 2));
-
-        //Draw the map to the screen
-        for (auto j: *d->getFloor(floor)->getMap())
-            for (auto k: j)
-                app.draw(k->getGraphicalRepresentation());
-
-        //Experimental shadow stuff
-        //drawShadows(&player);
-
-        //Experimental minimap stuff
-        drawMinimap();
-
-        selectedTile = (Tile *) (selectTile());
-
-        //Show the user where they are clicking and act on entities within that square
-        if (selectedTile != nullptr) {
-            drawTileOutline(selectedTile);
-            if (getTileActors(selectedTile) != nullptr && player != nullptr)
-                player->act(getTileActors(selectedTile));
-        }
-
-        for (auto a: actors)
-            app.draw(a->getSprite());
-
-        for (auto a: actors)
-            app.draw(a->getHealthBar());
-
-        //Update the debug info every second
-        if (textclk.getElapsedTime().asSeconds() >= 1) {
-            updateDebug();
-            textclk.restart();
-        }
-
-        if (debug)
-            showText(debugText, debugPos);
-
-        // Update the window
-        app.display();
+        update();
+        render();
     }
-    delete d;
 
+    //Clean up!
+    delete d;
 }
 
+//Utility function to switch coordinate systems
 sf::Vector2f Game::tileToWorldCoord(sf::Vector2i toConv) const {
     float x = toConv.x * 32;
     float y = toConv.y * 32;
@@ -274,6 +287,7 @@ sf::Vector2f Game::tileToWorldCoord(sf::Vector2i toConv) const {
     return sf::Vector2f(y, x);
 }
 
+//Utility function to switch coordinate systems
 sf::Vector2i Game::worldToTileCoord(sf::Vector2f pos) const {
     sf::Vector2i newPos;
     newPos.x = int(pos.y / 32);
@@ -281,6 +295,7 @@ sf::Vector2i Game::worldToTileCoord(sf::Vector2f pos) const {
     return newPos;
 }
 
+//Utility function to switch coordinate systems
 sf::Vector2i Game::worldToTileCoord(sf::Vector2i pos) const {
     sf::Vector2i newPos;
     newPos.x = pos.y / 32;
@@ -358,10 +373,11 @@ void Game::drawMinimap() {
     unsigned int size = 400; // The 'minimap' view will show a smaller picture of the map
     sf::View minimap(sf::FloatRect(standard.getCenter().x, standard.getCenter().y, static_cast<float>(size),
                                    static_cast<float>(app.getSize().y * size / app.getSize().x)));
-    minimap.setViewport(sf::FloatRect(1.f - static_cast<float>(minimap.getSize().x) / app.getSize().x - 0.02f,
-                                      1.f - static_cast<float>(minimap.getSize().y) / app.getSize().y - 0.02f,
-                                      static_cast<float>(minimap.getSize().x) / app.getSize().x,
-                                      static_cast<float>(minimap.getSize().y) / app.getSize().y));
+    //Set the viewport so we can draw a small map
+    minimap.setViewport(sf::FloatRect(1.f - (minimap.getSize().x) / app.getSize().x - 0.02f,
+                                      1.f - (minimap.getSize().y) / app.getSize().y - 0.02f,
+                                      (minimap.getSize().x) / app.getSize().x,
+                                      (minimap.getSize().y) / app.getSize().y));
     minimap.zoom(8.f);
     app.setView(minimap);
 
@@ -386,6 +402,7 @@ void Game::showText(string s, sf::Vector2f pos) {
     app.draw(t);
 }
 
+//Return a string with useful development information.
 string Game::updateDebug() {
     stringstream info;
     info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " <<

@@ -41,7 +41,7 @@ sf::RectangleShape Actor::getHealthBar() const {
 
 void Actor::setHP(double hp) {
     this->hp = hp;
-    healthBar.setScale(sf::Vector2f(getHP() / 100.0, 1));
+    healthBar.setScale(sf::Vector2f(getHP() / 100.0f, 1));
 }
 
 double Actor::getDamage() const {
