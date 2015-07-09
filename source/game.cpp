@@ -1,4 +1,6 @@
 #include "../include/game.h"
+#include "../include/state.h"
+#include "../include/menustate.h"
 
 using namespace std;
 
@@ -24,6 +26,14 @@ Game::Game() {
     focus = true;
 
     d = nullptr;
+}
+
+sf::RenderWindow *Game::getWindow() {
+    return &app;
+}
+
+Dungeon *Game::getDungeon() {
+    return d;
 }
 
 // Process events thrown by sfml
@@ -175,6 +185,18 @@ void Game::init() {
 
 //TODO: Flesh out in a full menu class
 void Game::menu() {
+    //State version
+    /*states.push(new MenuState());
+
+    while(!states.empty()) {
+        states.top()->update(this);
+        states.top()->render(this);
+    }
+    //states.push()
+    */
+
+
+    //Current version
     init();
     loop();
 }
@@ -190,9 +212,8 @@ void Game::update() {
             if (dynamic_cast<Player *>(*i)) {
                 *i = nullptr;
                 gameOver = true;
-                player = nullptr;
+                cout << "Player died..." << endl;
             }
-
             delete *i;
             *i = nullptr;
             actors.erase(i);
@@ -254,7 +275,7 @@ void Game::render() {
     }
 
     //Experimental shadow stuff
-    drawShadows(player);
+    //drawShadows(player);
 
     //Experimental minimap stuff
     drawMinimap();
@@ -269,10 +290,13 @@ void Game::render() {
 void Game::loop() {
     textclk.restart();
 
-    while (app.isOpen()) {
+    while (app.isOpen() && !gameOver) {
         update();
         render();
     }
+
+    if (gameOver)
+        app.close();
 
     //Clean up!
     delete d;
@@ -342,7 +366,7 @@ void Game::drawShadows(Entity *focus) {
     darkness.clear(sf::Color(100, 100, 100));
 
     sf::CircleShape light(60);
-    light.setOrigin(sf::Vector2f(light.getRadius() / 2.0f, light.getRadius() / 2.0f));
+    light.setOrigin(sf::Vector2f(light.getRadius(), light.getRadius()));
     light.setPosition(app.getSize().x / 2.0f, app.getSize().y / 2.0f);
     light.setFillColor(sf::Color(255, 255, 255, 200));
     darkness.draw(light, sf::BlendAdd);

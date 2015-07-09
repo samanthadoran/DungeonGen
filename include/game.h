@@ -8,17 +8,22 @@
 #include "npc.h"
 #include "dungeon.h"
 #include "map.h"
-#include "state.h"
 
 #include <sstream>
 #include <stack>
 #include <SFML/Audio.hpp>
+
+class State;
 
 class Game {
 public:
     Game();
 
     void menu();
+
+    Dungeon *getDungeon();
+
+    sf::RenderWindow *getWindow();
 
     virtual ~Game();
 
@@ -59,7 +64,7 @@ private:
     Dungeon *d;
     Player *player;
     vector<Actor *> actors;
-    stack<State> states;
+    stack<State *> states;
 
     void runEvents();
 
