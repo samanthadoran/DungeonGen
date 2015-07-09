@@ -234,12 +234,6 @@ void Game::render() {
         for (auto k: j)
             app.draw(k->getGraphicalRepresentation());
 
-    //Experimental shadow stuff
-    //drawShadows(&player);
-
-    //Experimental minimap stuff
-    drawMinimap();
-
     selectedTile = (Tile *) (selectTile());
 
     //Show the user where they are clicking and act on entities within that square
@@ -258,6 +252,12 @@ void Game::render() {
         updateDebug();
         textclk.restart();
     }
+
+    //Experimental shadow stuff
+    drawShadows(player);
+
+    //Experimental minimap stuff
+    drawMinimap();
 
     if (debug)
         showText(debugText, debugPos);
@@ -343,7 +343,7 @@ void Game::drawShadows(Entity *focus) {
 
     sf::CircleShape light(60);
     light.setOrigin(sf::Vector2f(light.getRadius() / 2.0f, light.getRadius() / 2.0f));
-    light.setPosition(app.getSize().x / 2.0f - 20, app.getSize().y / 2.0f - 40);
+    light.setPosition(app.getSize().x / 2.0f, app.getSize().y / 2.0f);
     light.setFillColor(sf::Color(255, 255, 255, 200));
     darkness.draw(light, sf::BlendAdd);
 
