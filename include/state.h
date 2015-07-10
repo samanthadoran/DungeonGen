@@ -18,7 +18,7 @@ public:
 
     virtual void handleEvents(Game *) = 0;
 
-    //void changeState(Game *, State *);
+    virtual ~State();
 
     State *toChange;
 

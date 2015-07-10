@@ -7,3 +7,7 @@
 State::State() {
     toChange = nullptr;
 }
+
+State::~State() {
+    toChange = nullptr;;
+}

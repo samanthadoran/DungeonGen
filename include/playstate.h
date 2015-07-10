@@ -19,15 +19,9 @@ public:
 
     void handleEvents(Game *);
 
+    ~PlayState();
+
 private:
-    void init();
-
-    void update();
-
-    void render();
-
-    void loop();
-
     sf::Vector2f tileToWorldCoord(sf::Vector2i) const;
 
     sf::Vector2i worldToTileCoord(sf::Vector2f) const;
@@ -36,15 +30,15 @@ private:
 
     Actor *getTileActors(Tile *);
 
-    const Tile *const selectTile();
+    const Tile *const selectTile(Game *);
 
-    void drawShadows(Entity *);
+    void drawShadows(Entity *, Game *);
 
-    void drawMinimap();
+    void drawMinimap(Game *);
 
-    void drawTileOutline(Tile *t);
+    void drawTileOutline(Tile *t, Game *);
 
-    void showText(string, sf::Vector2f);
+    void showText(string, sf::Vector2f, Game *);
 
     string updateDebug();
 
@@ -55,9 +49,6 @@ private:
     Dungeon *d;
     Player *player;
     vector<Actor *> actors;
-    stack<State *> states;
-
-    void runEvents();
 
     sf::Vector2f collisions(sf::Rect<float>, sf::Vector2f) const;
 
@@ -68,7 +59,6 @@ private:
     bool focus;
     bool debug;
 
-    sf::RenderWindow app;
     sf::Music music;
 
     //Debug info

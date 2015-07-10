@@ -20,7 +20,7 @@ public:
     void handleEvents(Game *);
 
 private:
-    bool select(Game *);
+    void select(Game *);
 
     int selection;
     sf::Font font;

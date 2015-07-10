@@ -51,14 +51,18 @@ void MenuState::handleEvents(Game *game) {
     }
 }
 
-bool MenuState::select(Game *game) {
+void MenuState::select(Game *game) {
+    Dungeon *d = nullptr;
     switch (selection) {
         case 0:
-            //game->setDungeon(new Dungeon(78, 78));
-            toChange = new PlayState(new Dungeon(78, 78));
+            d = new Dungeon(78, 78);
+            toChange = new PlayState(d);
+            game->setDungeon(d);
             break;
         case 1:
-            toChange = new PlayState(new Dungeon("default.txt"));
+            d = new Dungeon("default.txt");
+            toChange = new PlayState(d);
+            game->setDungeon(d);
             break;
         case 2:
             //game->getWindow()->close();
