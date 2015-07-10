@@ -4,6 +4,6 @@
 
 #include "../include/state.h"
 
-void State::changeState(Game *game, State *state) {
-    //game->changeState(state);
+State::State() {
+    toChange = nullptr;
 }

@@ -1,37 +1,24 @@
-#ifndef GAME_H
-#define GAME_H
+//
+// Created by Doran on 7/10/2015.
+//
 
+#ifndef DUNGEONGEN_PLAYSTATE_H
+#define DUNGEONGEN_PLAYSTATE_H
 
-#include "player.h"
-#include "item.h"
-#include "equipment.h"
-#include "npc.h"
-#include "dungeon.h"
-#include "map.h"
+#include "state.h"
 
-#include <sstream>
-#include <stack>
-#include <SFML/Audio.hpp>
+class Game;
 
-class State;
-
-class Game {
+class PlayState : public State {
 public:
-    Game();
+    PlayState(Dungeon *);
 
-    void menu();
+    void update(Game *);
 
-    void changeState(State *);
+    void render(Game *);
 
-    Dungeon *getDungeon();
+    void handleEvents(Game *);
 
-    void setDungeon(Dungeon *);
-
-    sf::RenderWindow *getWindow();
-
-    virtual ~Game();
-
-protected:
 private:
     void init();
 
@@ -93,4 +80,4 @@ private:
     sf::Time elapsed;
 };
 
-#endif // GAME_H
+#endif //DUNGEONGEN_PLAYSTATE_H

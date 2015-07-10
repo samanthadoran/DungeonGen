@@ -10,11 +10,19 @@
 
 class State {
 public:
+    State();
+
     virtual void update(Game *) = 0;
 
     virtual void render(Game *) = 0;
 
-    void changeState(Game *, State *);
+    virtual void handleEvents(Game *) = 0;
+
+    //void changeState(Game *, State *);
+
+    State *toChange;
+
+
 };
 
 #endif //DUNGEONGEN_STATE_H

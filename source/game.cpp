@@ -1,6 +1,7 @@
 #include "../include/game.h"
 #include "../include/state.h"
 #include "../include/menustate.h"
+#include "../include/playstate.h"
 
 using namespace std;
 
@@ -35,6 +36,11 @@ sf::RenderWindow *Game::getWindow() {
 Dungeon *Game::getDungeon() {
     return d;
 }
+
+void Game::setDungeon(Dungeon *dung) {
+    d = dung;
+}
+
 
 // Process events thrown by sfml
 void Game::runEvents() {
@@ -183,22 +189,33 @@ void Game::init() {
     music.play();
 }
 
+void Game::changeState(State *state) {
+    delete states.top();
+    states.pop();
+
+    states.push(state);
+}
+
 //TODO: Flesh out in a full menu class
 void Game::menu() {
     //State version
-    /*states.push(new MenuState());
+    states.push(new MenuState());
 
-    while(!states.empty()) {
+    while (!states.empty() && app.isOpen()) {
+        if (states.top()->toChange != nullptr)
+            changeState(states.top()->toChange);
+
+        states.top()->handleEvents(this);
         states.top()->update(this);
         states.top()->render(this);
     }
     //states.push()
-    */
+
 
 
     //Current version
-    init();
-    loop();
+    //init();
+    //loop();
 }
 
 void Game::update() {
@@ -275,7 +292,7 @@ void Game::render() {
     }
 
     //Experimental shadow stuff
-    //drawShadows(player);
+    drawShadows(player);
 
     //Experimental minimap stuff
     drawMinimap();

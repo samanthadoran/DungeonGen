@@ -6,7 +6,7 @@
 #define DUNGEONGEN_MENUSTATE_H
 
 #include "state.h"
-
+#include "playstate.h"
 class Game;
 
 class MenuState : public State {
@@ -17,7 +17,12 @@ public:
 
     void render(Game *);
 
+    void handleEvents(Game *);
+
 private:
+    bool select(Game *);
+
+    int selection;
     sf::Font font;
     vector<sf::Text> choices;
 };
