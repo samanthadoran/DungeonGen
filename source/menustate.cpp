@@ -8,11 +8,13 @@ MenuState::MenuState() {
     selection = 0;
     font.loadFromFile("Minecraftia.ttf");
 
+    //Consider making this dynamic
     choices.emplace_back("New...", font);
     choices.emplace_back("Load...", font);
     choices.emplace_back("Save...", font);
     choices.emplace_back("Exit...", font);
 
+    //Apply specific settings to our options
     for (auto &c: choices) {
         c.setColor(sf::Color::Blue);
         c.setOrigin(c.getLocalBounds().width / 2.0f, c.getLocalBounds().height / 2.0f);
@@ -21,6 +23,7 @@ MenuState::MenuState() {
 
 void MenuState::handleEvents(Game *game) {
 
+    //The user has made a selection
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return))
         select(game);
 
@@ -74,14 +77,17 @@ void MenuState::select(Game *game) {
 }
 
 void MenuState::update(Game *game) {
+    //We can't save if the dungeon doesn't exist
     if (game->getDungeon() == nullptr)
         choices[2].setString("Save...(Not available!)");
     else
         choices[2].setString("Save...");
 
+    //If we change the text size, we need to recenter it
     choices[2].setOrigin(choices[2].getLocalBounds().width / 2.0f,
                          choices[2].getLocalBounds().height / 2.0f);
 
+    //Keep the positions in the middle of the screen
     for (int i = 0; i < choices.size(); ++i)
         choices[i].setPosition(game->getWindow()->getView().getCenter() + sf::Vector2f(0, 30 * i));
 }
@@ -89,12 +95,14 @@ void MenuState::update(Game *game) {
 void MenuState::render(Game *game) {
     game->getWindow()->clear();
 
+    //Make a rect to show the user their current selection
     sf::RectangleShape showSelect(
             sf::Vector2f(choices[selection].getLocalBounds().width, choices[selection].getLocalBounds().height));
     showSelect.setFillColor(sf::Color::Green);
     showSelect.setOrigin(showSelect.getSize() / 2.0f);
-    showSelect.setPosition(choices[selection].getPosition());
+    showSelect.setPosition(choices[selection].getPosition() + sf::Vector2f(0, 3));
 
+    //The selection must be drawn first so as not to overlap with the text
     game->getWindow()->draw(showSelect);
 
     for (auto c: choices)

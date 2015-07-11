@@ -13,11 +13,11 @@ class MenuState : public State {
 public:
     MenuState();
 
-    void update(Game *);
+    void update(Game *) override;
 
-    void render(Game *);
+    void render(Game *) override;
 
-    void handleEvents(Game *);
+    void handleEvents(Game *) override;
 
 private:
     void select(Game *);

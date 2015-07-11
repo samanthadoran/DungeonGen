@@ -14,13 +14,13 @@ public:
 
     Player(sf::Vector2f, int, string);
 
-    void act(Actor *);
+    void act(Actor *) override;
 
-    std::string toString() const;
+    std::string toString() const override;
 
-    void control();
+    void control() override;
 
-    virtual ~Player();
+    ~Player();
 
 protected:
 private:

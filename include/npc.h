@@ -10,17 +10,17 @@ class NPC : public Actor {
 public:
     NPC(sf::Vector2f, string);
 
-    void act(Actor *);
+    void act(Actor *) override;
 
-    void control();
+    void control() override;
 
     void setTarget(Actor *);
 
     double attack(Entity *);
 
-    std::string toString() const;
+    std::string toString() const override;
 
-    virtual ~NPC();
+    ~NPC();
 
 protected:
 private:

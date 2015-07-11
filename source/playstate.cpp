@@ -11,8 +11,9 @@ PlayState::PlayState(Dungeon *dungeon) {
     selectedTile = nullptr;
     floor = 0;
 
-    music.openFromFile("music.ogg");
-    music.setLoop(true);
+    //Music is broken until update to sfml 2.3
+    //music.openFromFile("music.ogg");
+    //music.setLoop(true);
 
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
@@ -24,6 +25,7 @@ PlayState::PlayState(Dungeon *dungeon) {
     debug = true;
     focus = true;
 
+    //Test actors
     actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 160, "link.png"));
     actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
 
@@ -33,8 +35,8 @@ PlayState::PlayState(Dungeon *dungeon) {
     actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
     player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
 
-    music.setVolume(20);
-    music.play();
+    //music.setVolume(20);
+    //music.play();
 }
 
 //Returns a modified vector to obey collision models
@@ -45,10 +47,12 @@ sf::Vector2f PlayState::collisions(sf::Rect<float> test, sf::Vector2f movement) 
 
     future.left += movement.x * elapsed.asSeconds();
     futurePos = sf::Vector2f(future.left, future.top);
-    if (!d->getFloor(floor)->inBounds(futurePos)) {
-        movement.x = 0;
-    }
 
+    //You can't walk where the dungeon isn't
+    if (!d->getFloor(floor)->inBounds(futurePos))
+        movement.x = 0;
+
+    //Don't walk through walls
     for (auto row: *d->getFloor(floor)->getMap())
         for (auto tile: row)
             if (tile->getTileType() ==
@@ -58,10 +62,12 @@ sf::Vector2f PlayState::collisions(sf::Rect<float> test, sf::Vector2f movement) 
     future = test;
     future.top += movement.y * elapsed.asSeconds();
     futurePos = sf::Vector2f(future.left, future.top);
-    if (!d->getFloor(floor)->inBounds(futurePos)) {
-        movement.y = 0;
-    }
 
+    //You still can't walk where the dungeon isn't
+    if (!d->getFloor(floor)->inBounds(futurePos))
+        movement.y = 0;
+
+    //You still can't walk through walls
     for (auto row: *d->getFloor(floor)->getMap())
         for (auto tile: row)
             if (tile->getTileType() ==
@@ -149,10 +155,10 @@ void PlayState::handleEvents(Game *game) {
                     player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
                     break;
                 case sf::Keyboard::M:
-                    if (music.getVolume() == 0)
+                    /*if (music.getVolume() == 0)
                         music.setVolume(20);
                     else
-                        music.setVolume(0);
+                        music.setVolume(0);*/
                     break;
                 default:
                     break;
@@ -236,11 +242,10 @@ void PlayState::render(Game *game) {
         drawTileOutline(selectedTile, game);
     }
 
-    for (auto a: actors)
+    for (auto a: actors) {
         game->getWindow()->draw(a->getSprite());
-
-    for (auto a: actors)
         game->getWindow()->draw(a->getHealthBar());
+    }
 
     //Update the debug info every second
     if (textclk.getElapsedTime().asSeconds() >= 1) {

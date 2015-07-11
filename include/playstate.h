@@ -13,11 +13,11 @@ class PlayState : public State {
 public:
     PlayState(Dungeon *);
 
-    void update(Game *);
+    void update(Game *) override;
 
-    void render(Game *);
+    void render(Game *) override;
 
-    void handleEvents(Game *);
+    void handleEvents(Game *) override;
 
     ~PlayState();
 
@@ -59,7 +59,7 @@ private:
     bool focus;
     bool debug;
 
-    sf::Music music;
+    //sf::Music music;
 
     //Debug info
     string debugText;

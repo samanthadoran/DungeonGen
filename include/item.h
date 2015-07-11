@@ -11,11 +11,11 @@ class Item : public Actor {
 public:
     Item(sf::Vector2f, int, string, string, int, int);
 
-    string toString() const;
+    string toString() const override;
 
-    void control();
+    void control() override;
 
-    void act(Actor *);
+    void act(Actor *) override;
 
     virtual ~Item();
 

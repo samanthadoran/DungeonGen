@@ -9,7 +9,5 @@ int main() {
     Game g;
     g.menu();
 
-    cout << "Crash experienced is the fault of SFML, sorry" << endl;
-
     return 0;
 }
