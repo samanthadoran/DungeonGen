@@ -25,7 +25,7 @@ public:
 
     Dungeon *getDungeon();
 
-    void setDungeon(Dungeon*);
+    void setDungeon(Dungeon *);
 
     sf::RenderWindow *getWindow();
 

@@ -7,6 +7,7 @@
 
 #include "state.h"
 #include "playstate.h"
+
 class Game;
 
 class MenuState : public State {

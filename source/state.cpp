@@ -9,5 +9,5 @@ State::State() {
 }
 
 State::~State() {
-    toChange = nullptr;;
+    toChange = nullptr;
 }
