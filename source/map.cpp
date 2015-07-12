@@ -26,10 +26,13 @@ Map::Map(int w, int h) {
     //I'm sure this can be done better.
     textures.push_back(new sf::Texture());
     textures.back()->loadFromFile("floor.png");
+
     textures.push_back(new sf::Texture());
     textures.back()->loadFromFile("wall.png");
+
     textures.push_back(new sf::Texture());
     textures.back()->loadFromFile("stairs_down.png");
+
     textures.push_back(new sf::Texture());
     textures.back()->loadFromFile("stairs_up.png");
 }

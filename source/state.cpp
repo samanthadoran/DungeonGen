@@ -6,6 +6,7 @@
 
 State::State() {
     toChange = nullptr;
+    toKill = false;
 }
 
 State::~State() {

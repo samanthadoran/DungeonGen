@@ -12,7 +12,8 @@ MenuState::MenuState() {
     choices.emplace_back("New...", font);
     choices.emplace_back("Load...", font);
     choices.emplace_back("Save...", font);
-    choices.emplace_back("Exit...", font);
+    choices.emplace_back("Resume...", font);
+    choices.emplace_back("Quit...", font);
 
     //Apply specific settings to our options
     for (auto &c: choices) {
@@ -68,10 +69,15 @@ void MenuState::select(Game *game) {
             game->setDungeon(d);
             break;
         case 2:
-            //game->getWindow()->close();
+            game->getDungeon()->saveDungeon("default.txt");
             break;
         case 3:
+            toKill = true;
+            break;
+        case 4:
             game->getWindow()->close();
+            break;
+        default:
             break;
     }
 }

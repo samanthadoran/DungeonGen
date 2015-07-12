@@ -23,6 +23,10 @@ public:
 
     void changeState(State *);
 
+    void pushState(State *);
+
+    void popState();
+
     Dungeon *getDungeon();
 
     void setDungeon(Dungeon *);

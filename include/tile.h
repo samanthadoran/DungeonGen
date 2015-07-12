@@ -26,7 +26,7 @@ public:
 
     char getTextualRepresentation() const;
 
-    sf::RectangleShape getGraphicalRepresentation() const;
+    const sf::RectangleShape & getGraphicalRepresentation() const;
 
     void setTileType(TileType);
 

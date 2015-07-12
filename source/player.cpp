@@ -16,6 +16,11 @@ void Player::act(Actor *a) {
 void Player::control() {
     updateInput();
     parseInput();
+
+    //Clamp velocity
+    float magnitude = sqrt(getVelocity().x * getVelocity().x + getVelocity().y * getVelocity().y);
+    sf::Vector2f unit = getVelocity()/magnitude;
+    setVelocity(unit * terminalVelocity);
 }
 
 //May god forgive me for this function

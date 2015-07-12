@@ -21,6 +21,8 @@ public:
     virtual ~State();
 
     State *toChange;
+
+    bool toKill;
 };
 
 #endif //DUNGEONGEN_STATE_H

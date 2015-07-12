@@ -34,7 +34,7 @@ private:
 
     void drawShadows(Entity *, Game *);
 
-    void drawMinimap(Game *);
+    void drawMinimap(Game *, sf::Texture &);
 
     void drawTileOutline(Tile *t, Game *);
 
@@ -54,10 +54,13 @@ private:
 
     void runTileEvent(Player *);
 
-    unsigned int targetfps;
-    bool vsync;
     bool focus;
     bool debug;
+
+    bool paused;
+
+    bool vsync;
+    unsigned int targetfps;
 
     //sf::Music music;
 

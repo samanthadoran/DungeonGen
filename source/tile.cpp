@@ -4,7 +4,7 @@ Tile::Tile(vector<sf::Texture *> *tex, int x, int y, TileType t) :
         type(t) {
     textures = tex;
     pos = sf::Vector2i(x, y);
-
+    r = sf::RectangleShape();
     r.setSize(sf::Vector2f(32, 32));
     r.setPosition(sf::Vector2f(pos.y * 32, pos.x * 32));
 
@@ -64,7 +64,7 @@ char Tile::getTextualRepresentation() const {
 }
 
 
-sf::RectangleShape Tile::getGraphicalRepresentation() const {
+const sf::RectangleShape &Tile::getGraphicalRepresentation() const {
     return r;
 }
 
@@ -81,7 +81,6 @@ void Tile::setTileType(TileType t) {
     r.setSize(sf::Vector2f(32, 32));
     r.setPosition(sf::Vector2f(pos.y * 32, pos.x * 32));
     type = t;
-
     switch (type) {
         case TileType::BLANK:
             r.setFillColor(sf::Color::Black);

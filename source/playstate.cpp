@@ -3,6 +3,7 @@
 //
 
 #include "../include/playstate.h"
+#include "../include/menustate.h"
 
 PlayState::PlayState(Dungeon *dungeon) {
     d = dungeon;
@@ -11,6 +12,8 @@ PlayState::PlayState(Dungeon *dungeon) {
     selectedTile = nullptr;
     floor = 0;
 
+    paused = false;
+
     //Music is broken until update to sfml 2.3
     //music.openFromFile("music.ogg");
     //music.setLoop(true);
@@ -18,15 +21,15 @@ PlayState::PlayState(Dungeon *dungeon) {
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
 
-    targetfps = 60;
-    vsync = true;
-
     //to toggle debug output
     debug = true;
     focus = true;
 
+    vsync = true;
+    targetfps = 60;
+
     //Test actors
-    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 160, "link.png"));
+    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
     actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
 
     player = dynamic_cast<Player *>(actors.front());
@@ -133,8 +136,8 @@ void PlayState::handleEvents(Game *game) {
         if (event.type == sf::Event::KeyPressed) {
             switch (event.key.code) {
                 case sf::Keyboard::Escape:
-                    gameOver = true;
-                    game->getWindow()->close();
+                    game->pushState(new MenuState());
+                    paused = true;
                     break;
                 case sf::Keyboard::F1:
                     debug = !debug;
@@ -168,10 +171,32 @@ void PlayState::handleEvents(Game *game) {
 }
 
 void PlayState::update(Game *game) {
+    //We were in a menu, we need another once around to clear the clocks
+    if (paused) {
+        clk.restart();
+        paused = false;
+        return;
+    }
+
+    //Time to close up shop!
     if (gameOver) {
         player = nullptr;
         game->getWindow()->close();
         return;
+    }
+
+    //The user must have loaded a new dungeon or generated one! Update accordingly
+    if (game->getDungeon() != d) {
+        d = game->getDungeon();
+        //Test actors
+        actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
+        actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
+
+        player = dynamic_cast<Player *>(actors.front());
+        dynamic_cast<NPC *>(actors.back())->setTarget(player);
+
+        actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
+        player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
     }
 
     elapsed = clk.restart();
@@ -233,9 +258,14 @@ void PlayState::render(Game *game) {
                           game->getWindow()->getView().getCenter().y - (currView.getSize().y / 2));
 
     //Draw the map to the screen
-    for (auto j: *d->getFloor(floor)->getMap())
-        for (auto k: j)
-            game->getWindow()->draw(k->getGraphicalRepresentation());
+    for (auto row: *d->getFloor(floor)->getMap())
+        for (auto tile: row)
+            game->getWindow()->draw(tile->getGraphicalRepresentation());
+
+    sf::Texture window;
+    window.setSmooth(true);
+    window.create(game->getWindow()->getSize().x, game->getWindow()->getSize().y);
+    window.update(*game->getWindow());
 
     //Show the user where they are clicking and act on entities within that square
     if (selectedTile != nullptr) {
@@ -257,7 +287,7 @@ void PlayState::render(Game *game) {
     //drawShadows(player, game);
 
     //Experimental minimap stuff
-    drawMinimap(game);
+    drawMinimap(game, window);
 
     if (debug)
         showText(debugText, debugPos, game);
@@ -356,7 +386,7 @@ void PlayState::drawTileOutline(Tile *t, Game *game) {
     game->getWindow()->draw(outline);
 }
 
-void PlayState::drawMinimap(Game *game) {
+void PlayState::drawMinimap(Game *game, sf::Texture &f) {
     sf::View standard = game->getWindow()->getView();
     unsigned int size = 400; // The 'minimap' view will show a smaller picture of the map
     sf::View minimap(sf::FloatRect(standard.getCenter().x, standard.getCenter().y, static_cast<float>(size),
@@ -367,13 +397,14 @@ void PlayState::drawMinimap(Game *game) {
                                       1.f - (minimap.getSize().y) / game->getWindow()->getSize().y - 0.02f,
                                       (minimap.getSize().x) / game->getWindow()->getSize().x,
                                       (minimap.getSize().y) / game->getWindow()->getSize().y));
-    minimap.zoom(8.f);
+    //minimap.zoom(8.f);
     game->getWindow()->setView(minimap);
+    sf::RectangleShape d(minimap.getSize());
+    d.setOrigin(d.getLocalBounds().width / 2.f, d.getLocalBounds().height / 2.f);
+    d.setTexture(&f);
+    d.setPosition(minimap.getCenter());
+    game->getWindow()->draw(d);
 
-    //Draw the minimap to the screen
-    for (auto row: *d->getFloor(floor)->getMap())
-        for (auto tile: row)
-            game->getWindow()->draw(tile->getGraphicalRepresentation());
     game->getWindow()->setView(standard);
 }
 
@@ -395,7 +426,7 @@ void PlayState::showText(string s, sf::Vector2f pos, Game *game) {
 string PlayState::updateDebug() {
     stringstream info;
     info << "Vsync: " << (vsync ? "Enabled" : "Disabled") << "\nTarget FPS: " << targetfps << "\nFPS: " <<
-    (int) ((1.f / elapsed.asSeconds()) + .5) << "\nSPF: " << elapsed.asSeconds();
+            (int) ((1000.f / elapsed.asMilliseconds())) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
 
     if (player != nullptr)

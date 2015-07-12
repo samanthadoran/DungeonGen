@@ -41,18 +41,30 @@ void Game::changeState(State *state) {
     states.push(state);
 }
 
+void Game::pushState(State *state) {
+    states.push(state);
+}
+
+void Game::popState() {
+    delete states.top();
+    states.pop();
+}
+
 //TODO: Flesh out in a full menu class
 void Game::menu() {
     //State version
     states.push(new MenuState());
 
     while (!states.empty() && app.isOpen()) {
-        if (states.top()->toChange != nullptr)
-            changeState(states.top()->toChange);
-
         states.top()->handleEvents(this);
         states.top()->update(this);
         states.top()->render(this);
+
+        if (states.top()->toChange != nullptr)
+            changeState(states.top()->toChange);
+
+        if (states.top()->toKill)
+            popState();
     }
 }
 
