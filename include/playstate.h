@@ -42,6 +42,8 @@ private:
 
     void drawTileOutline(Tile *t, Game *);
 
+    void drawInventoryOfActor(Actor *, Game *);
+
     void showText(string, sf::Vector2f, Game *);
 
     string updateDebug();

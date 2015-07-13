@@ -9,7 +9,7 @@ class Item;
 using std::string;
 using std::vector;
 
-class Actor : public Entity {
+class Actor : public Entity, public sf::Drawable {
 public:
     Actor(sf::Vector2f, int, string, string);
 
@@ -38,6 +38,7 @@ public:
     virtual ~Actor();
 
 private:
+    void draw(sf::RenderTarget &, sf::RenderStates) const;
     sf::RectangleShape healthBar;
     vector<Actor *> items;
     string name;

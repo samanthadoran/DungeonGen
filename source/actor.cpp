@@ -48,6 +48,11 @@ double Actor::getDamage() const {
     return damage;
 }
 
+void Actor::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    target.draw(getSprite(), states);
+    target.draw(getHealthBar(), states);
+}
+
 Actor::~Actor() {
     for (int i = 0; i < items.size(); ++i) {
         delete items[i];

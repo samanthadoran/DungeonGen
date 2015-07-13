@@ -31,8 +31,8 @@ PlayState::PlayState(Dungeon *dungeon) {
     player = dynamic_cast<Player *>(actors.front());
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
 
-    actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
-    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
+    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
+    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", -1, 200));
 }
 
 //Returns a modified vector to obey collision models
@@ -149,11 +149,13 @@ void PlayState::handleEvents(Game *game) {
 void PlayState::checkActorLife() {
     for (auto i = actors.begin(); i != actors.end(); ++i) {
         if (!(*i)->isAlive()) {
-            if (dynamic_cast<Player *>(*i)) {
-                delete *i;
-                *i = nullptr;
-                gameOver = true;
-                player = nullptr;
+            if (i == actors.begin()) {
+                if (dynamic_cast<Player *>(*i)) {
+                    delete *i;
+                    *i = nullptr;
+                    gameOver = true;
+                    player = nullptr;
+                }
             }
             delete *i;
             *i = nullptr;
@@ -182,8 +184,8 @@ void PlayState::dungeonChange(Game *game) {
     player = dynamic_cast<Player *>(actors.front());
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
 
-    actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
-    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
+    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
+    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
 }
 
 void PlayState::update(Game *game) {
@@ -248,9 +250,7 @@ void PlayState::render(Game *game) {
                           game->getWindow()->getView().getCenter().y - (currView.getSize().y / 2));
 
     //Draw the map to the screen
-    for (auto row: *d->getFloor(floor)->getMap())
-        for (auto tile: row)
-            game->getWindow()->draw(tile->getGraphicalRepresentation());
+    game->getWindow()->draw(*d->getFloor(floor));
 
     sf::Texture window;
     window.setSmooth(true);
@@ -261,10 +261,8 @@ void PlayState::render(Game *game) {
     if (selectedTile != nullptr)
         drawTileOutline(selectedTile, game);
 
-    for (auto a: actors) {
-        game->getWindow()->draw(a->getSprite());
-        game->getWindow()->draw(a->getHealthBar());
-    }
+    for (auto a: actors)
+        game->getWindow()->draw(*a);
 
     //Update the debug info every second
     if (textclk.getElapsedTime().asSeconds() >= 1) {
@@ -386,7 +384,7 @@ void PlayState::drawMinimap(Game *game, sf::Texture &f) {
                                       1.f - (minimap.getSize().y) / game->getWindow()->getSize().y - 0.02f,
                                       (minimap.getSize().x) / game->getWindow()->getSize().x,
                                       (minimap.getSize().y) / game->getWindow()->getSize().y));
-    //minimap.zoom(8.f);
+
     game->getWindow()->setView(minimap);
     sf::RectangleShape d(minimap.getSize());
     d.setOrigin(d.getLocalBounds().width / 2.f, d.getLocalBounds().height / 2.f);
@@ -395,6 +393,10 @@ void PlayState::drawMinimap(Game *game, sf::Texture &f) {
     game->getWindow()->draw(d);
 
     game->getWindow()->setView(standard);
+}
+
+void PlayState::drawInventoryOfActor(Actor *a, Game *game) {
+
 }
 
 //Show supplied text at supplied position

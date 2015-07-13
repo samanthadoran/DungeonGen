@@ -15,7 +15,7 @@
 
 using namespace std;
 
-class Map {
+class Map : public sf::Drawable {
 public:
     Map();
 
@@ -73,6 +73,8 @@ private:
 
     //Please replace.
     bool addRoom(int, int, int, int);
+
+    void draw(sf::RenderTarget &, sf::RenderStates) const;
 
     vector<Room> rooms;
 

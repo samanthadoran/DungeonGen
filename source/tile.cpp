@@ -6,7 +6,7 @@ Tile::Tile(vector<sf::Texture *> *tex, int x, int y, TileType t) :
     pos = sf::Vector2i(x, y);
     r = sf::RectangleShape();
     r.setSize(sf::Vector2f(32, 32));
-    r.setPosition(sf::Vector2f(pos.y * 32, pos.x * 32));
+    r.setPosition(sf::Vector2f(pos.y * r.getSize().y, pos.x * r.getSize().x));
 
     switch (type) {
         case TileType::BLANK:
@@ -27,7 +27,7 @@ Tile::Tile(vector<sf::Texture *> *tex, int x, int y, TileType t) :
     }
 }
 
-TileType Tile::getTileType() const {
+const TileType &Tile::getTileType() const {
     return type;
 }
 
@@ -79,7 +79,7 @@ void Tile::setPos(sf::Vector2i p) {
 void Tile::setTileType(TileType t) {
     r = sf::RectangleShape();
     r.setSize(sf::Vector2f(32, 32));
-    r.setPosition(sf::Vector2f(pos.y * 32, pos.x * 32));
+    r.setPosition(sf::Vector2f(pos.y * r.getSize().y, pos.x * r.getSize().x));
     type = t;
     switch (type) {
         case TileType::BLANK:

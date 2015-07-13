@@ -386,14 +386,21 @@ const Tile *const Map::getTileAtPos(sf::Vector2f input) const {
 
 const Tile *const Map::getTileAtPos(sf::Vector2i input) const {
     //Check y bound
-    if (input.y < 0 || input.y >= tiles.size())
+    if (input.y < 0 || input.y >= height)
         return nullptr;
 
     //Check x bound
-    if (input.x < 0 || input.x >= tiles[0].size())
+    if (input.x < 0 || input.x >= width)
         return nullptr;
 
     return tiles[input.x][input.y];
+}
+
+void Map::draw(sf::RenderTarget &target, sf::RenderStates states) const {
+    for (auto row: tiles)
+        for (auto tile: row)
+            if (tile->getTileType() != TileType::BLANK)
+                target.draw(tile->getGraphicalRepresentation(), states);
 }
 
 Map::~Map() {

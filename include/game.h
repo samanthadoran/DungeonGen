@@ -3,6 +3,7 @@
 
 
 #include "player.h"
+#include "weapon.h"
 #include "item.h"
 #include "equipment.h"
 #include "npc.h"

@@ -69,10 +69,12 @@ void MenuState::select(Game *game) {
             game->setDungeon(d);
             break;
         case 2:
-            game->getDungeon()->saveDungeon("default.txt");
+            if (game->getDungeon() != nullptr)
+                game->getDungeon()->saveDungeon("default.txt");
             break;
         case 3:
-            toKill = true;
+            if (game->getDungeon() != nullptr)
+                toKill = true;
             break;
         case 4:
             game->getWindow()->close();
@@ -84,14 +86,20 @@ void MenuState::select(Game *game) {
 
 void MenuState::update(Game *game) {
     //We can't save if the dungeon doesn't exist
-    if (game->getDungeon() == nullptr)
+    if (game->getDungeon() == nullptr) {
         choices[2].setString("Save...(Not available!)");
-    else
+        choices[3].setString("Resume...(Not available!)");
+    }
+    else {
         choices[2].setString("Save...");
+        choices[3].setString("Resume...");
+    }
 
     //If we change the text size, we need to recenter it
     choices[2].setOrigin(choices[2].getLocalBounds().width / 2.0f,
                          choices[2].getLocalBounds().height / 2.0f);
+    choices[3].setOrigin(choices[3].getLocalBounds().width / 2.0f,
+                         choices[3].getLocalBounds().height / 2.0f);
 
     //Keep the positions in the middle of the screen
     for (int i = 0; i < choices.size(); ++i)

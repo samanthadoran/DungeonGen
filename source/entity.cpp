@@ -44,7 +44,7 @@ sf::Vector2f Entity::getPosition() const {
     return position;
 }
 
-sf::Sprite Entity::getSprite() const {
+const sf::Sprite &Entity::getSprite() const {
     return m_sprite;
 }
 

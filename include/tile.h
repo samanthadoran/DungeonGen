@@ -18,7 +18,7 @@ class Tile {
 public:
     Tile(vector<sf::Texture *> *, int, int, TileType = TileType::BLANK);
 
-    TileType getTileType() const;
+    const TileType &getTileType() const;
 
     sf::Vector2i getPos() const;
 

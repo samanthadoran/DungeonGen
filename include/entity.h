@@ -29,7 +29,7 @@ public:
 
     unsigned int getUUID() const;
 
-    sf::Sprite getSprite() const;
+    const sf::Sprite &getSprite() const;
 
     sf::RectangleShape getCollisionAABB() const;
 
