@@ -68,7 +68,7 @@ private:
     bool vsync;
     unsigned int targetfps;
 
-    //sf::Music music;
+    int score;
 
     //Debug info
     string debugText;

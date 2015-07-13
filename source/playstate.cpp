@@ -6,6 +6,7 @@
 #include "../include/menustate.h"
 
 PlayState::PlayState(Dungeon *dungeon) {
+    score = 0;
     d = dungeon;
 
     gameOver = false;
@@ -80,6 +81,7 @@ void PlayState::runTileEvent(Player *p) {
 
     switch (type) {
         case TileType::STAIRS_UP:
+            paused = true;
             if (floor == 0)
                 //app.close();
                 gameOver = true;
@@ -89,6 +91,7 @@ void PlayState::runTileEvent(Player *p) {
             }
             break;
         case TileType::STAIRS_DOWN:
+            paused = true;
             if (d->getFloors().size() == floor + 1)
                 d->addFloor();
 
@@ -186,6 +189,8 @@ void PlayState::dungeonChange(Game *game) {
 
     actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
     player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
+
+    score = 0;
 }
 
 void PlayState::update(Game *game) {
@@ -246,8 +251,12 @@ void PlayState::render(Game *game) {
     sf::View currView = game->getWindow()->getView();
     currView.setCenter(player->getPosition());
     game->getWindow()->setView(currView);
+
+
+    //Get the position to place the debug text at
     sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2),
                           game->getWindow()->getView().getCenter().y - (currView.getSize().y / 2));
+
 
     //Draw the map to the screen
     game->getWindow()->draw(*d->getFloor(floor));
@@ -278,6 +287,7 @@ void PlayState::render(Game *game) {
 
     if (debug)
         showText(debugText, debugPos, game);
+
 
     //Update the window
     game->getWindow()->display();

@@ -19,7 +19,8 @@ void Item::act(Actor *a) {
     if (getHP() != -1)
         setHP(getHP() - 1);
 
-    a->setHP(a->getHP() - this->getDamage());
+    if (a != nullptr)
+        a->setHP(a->getHP() - this->getDamage());
 }
 
 
