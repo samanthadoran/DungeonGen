@@ -30,6 +30,10 @@ private:
 
     Actor *getTileActors(Tile *);
 
+    void checkActorLife();
+
+    void dungeonChange(Game *);
+
     const Tile *const selectTile(Game *);
 
     void drawShadows(Entity *, Game *);

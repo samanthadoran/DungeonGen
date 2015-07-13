@@ -14,10 +14,6 @@ PlayState::PlayState(Dungeon *dungeon) {
 
     paused = false;
 
-    //Music is broken until update to sfml 2.3
-    //music.openFromFile("music.ogg");
-    //music.setLoop(true);
-
     //Load font for debugging
     font.loadFromFile("Minecraftia.ttf");
 
@@ -37,9 +33,6 @@ PlayState::PlayState(Dungeon *dungeon) {
 
     actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
     player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
-
-    //music.setVolume(20);
-    //music.play();
 }
 
 //Returns a modified vector to obey collision models
@@ -110,8 +103,8 @@ void PlayState::runTileEvent(Player *p) {
 void PlayState::handleEvents(Game *game) {
     sf::Event event;
     while (game->getWindow()->pollEvent(event)) {
+        //Update the view to the new size of the window
         if (event.type == sf::Event::Resized) {
-            // update the view to the new size of the window
             sf::FloatRect newView(0, 0, event.size.width, event.size.height);
             newView.left = game->getWindow()->getView().getCenter().x - game->getWindow()->getView().getSize().x / 2.0f;
             newView.top = game->getWindow()->getView().getCenter().y - game->getWindow()->getView().getSize().y / 2.0f;
@@ -132,42 +125,65 @@ void PlayState::handleEvents(Game *game) {
             game->getWindow()->close();
         }
 
-        //Escape key: exit
         if (event.type == sf::Event::KeyPressed) {
             switch (event.key.code) {
+                //Go to menus
                 case sf::Keyboard::Escape:
                     game->pushState(new MenuState());
                     paused = true;
                     break;
+                    //Show the user helpful debug info
                 case sf::Keyboard::F1:
                     debug = !debug;
                     break;
-                case sf::Keyboard::F5:
-                    d->saveDungeon("default.txt");
-                    break;
-                case sf::Keyboard::F9:
-                    delete d;
-                    d = new Dungeon("default.txt");
-                    floor = 0;
-                    if (player == nullptr) {
-                        actors.emplace(actors.begin(),
-                                       new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 160,
-                                                  "link.png"));
-                        player = dynamic_cast<Player *>(actors.front());
-                    }
-                    player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
-                    break;
+                    //Music is defunct as of now
                 case sf::Keyboard::M:
-                    /*if (music.getVolume() == 0)
-                        music.setVolume(20);
-                    else
-                        music.setVolume(0);*/
                     break;
                 default:
                     break;
             }
         }
     }
+}
+
+void PlayState::checkActorLife() {
+    for (auto i = actors.begin(); i != actors.end(); ++i) {
+        if (!(*i)->isAlive()) {
+            if (dynamic_cast<Player *>(*i)) {
+                delete *i;
+                *i = nullptr;
+                gameOver = true;
+                player = nullptr;
+            }
+            delete *i;
+            *i = nullptr;
+            actors.erase(i);
+            if (actors.empty())
+                break;
+            i = actors.begin();
+        }
+    }
+}
+
+void PlayState::dungeonChange(Game *game) {
+    for (int i = 0; i < actors.size(); ++i)
+        delete actors[i];
+
+    actors.clear();
+    delete d;
+
+    d = game->getDungeon();
+    floor = 0;
+
+    //Test actors
+    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
+    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
+
+    player = dynamic_cast<Player *>(actors.front());
+    dynamic_cast<NPC *>(actors.back())->setTarget(player);
+
+    actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
+    player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
 }
 
 void PlayState::update(Game *game) {
@@ -186,41 +202,16 @@ void PlayState::update(Game *game) {
     }
 
     //The user must have loaded a new dungeon or generated one! Update accordingly
-    if (game->getDungeon() != d) {
-        d = game->getDungeon();
-        //Test actors
-        actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
-        actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
-
-        player = dynamic_cast<Player *>(actors.front());
-        dynamic_cast<NPC *>(actors.back())->setTarget(player);
-
-        actors.back()->addItem(new Item(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
-        player->addItem(new Item(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
-    }
+    if (game->getDungeon() != d)
+        dungeonChange(game);
 
     elapsed = clk.restart();
 
     //Check for application events.
     handleEvents(game);
 
-    for (auto i = actors.begin(); i != actors.end(); ++i) {
-        if (!(*i)->isAlive()) {
-            if (dynamic_cast<Player *>(*i)) {
-                delete *i;
-                *i = nullptr;
-                gameOver = true;
-                player = nullptr;
-                cout << "Player died..." << endl;
-            }
-            delete *i;
-            *i = nullptr;
-            actors.erase(i);
-            if (actors.empty())
-                break;
-            i = actors.begin();
-        }
-    }
+    //Make sure that actors are still alive
+    checkActorLife();
 
     if (gameOver)
         return;
@@ -236,10 +227,9 @@ void PlayState::update(Game *game) {
     selectedTile = (Tile *) (selectTile(game));
 
     //Show the user where they are clicking and act on entities within that square
-    if (selectedTile != nullptr) {
+    if (selectedTile != nullptr)
         if (getTileActors(selectedTile) != nullptr && player != nullptr)
             player->act(getTileActors(selectedTile));
-    }
 }
 
 void PlayState::render(Game *game) {
@@ -268,9 +258,8 @@ void PlayState::render(Game *game) {
     window.update(*game->getWindow());
 
     //Show the user where they are clicking and act on entities within that square
-    if (selectedTile != nullptr) {
+    if (selectedTile != nullptr)
         drawTileOutline(selectedTile, game);
-    }
 
     for (auto a: actors) {
         game->getWindow()->draw(a->getSprite());
