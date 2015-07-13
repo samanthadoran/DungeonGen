@@ -13,6 +13,11 @@ Actor::Actor(sf::Vector2f pos, int damage, string filename, string name) : Entit
 void Actor::update(sf::Time elapsed) {
     Entity::update(elapsed);
 
+    for (auto i: items) {
+        i->setPosition(getPosition());
+        i->update(elapsed);
+    }
+
     if (hp < 0)
         kill();
 
@@ -51,6 +56,9 @@ double Actor::getDamage() const {
 void Actor::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(getSprite(), states);
     target.draw(getHealthBar(), states);
+
+    if (!items.empty())
+        target.draw(items[0]->getSprite(), states);
 }
 
 Actor::~Actor() {

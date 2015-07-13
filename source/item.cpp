@@ -1,5 +1,4 @@
 #include "../include/item.h"
-
 Item::Item(sf::Vector2f pos, int damage, string filename, string name, int uses, int reUse) : Actor(pos, damage,
                                                                                                     filename, name) {
     setHP(uses);
@@ -11,9 +10,14 @@ void Item::act(Actor *a) {
     //Don't spam items!
     if (coolDownTimer.getElapsedTime().asMilliseconds() < coolDown)
         return;
+
     coolDownTimer.restart();
 
-    setHP(getHP() - 1);
+    if (getHP() <= 0 && getHP() != -1)
+        return;
+
+    if (getHP() != -1)
+        setHP(getHP() - 1);
 
     a->setHP(a->getHP() - this->getDamage());
 }

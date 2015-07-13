@@ -32,7 +32,7 @@ PlayState::PlayState(Dungeon *dungeon) {
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
 
     actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
-    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", -1, 200));
+    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
 }
 
 //Returns a modified vector to obey collision models
@@ -184,8 +184,8 @@ void PlayState::dungeonChange(Game *game) {
     player = dynamic_cast<Player *>(actors.front());
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
 
-    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "link.png", "claws", -1, 200));
-    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "link.png", "sword", -1, 200));
+    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
+    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
 }
 
 void PlayState::update(Game *game) {
