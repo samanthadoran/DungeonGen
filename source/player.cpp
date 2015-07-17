@@ -41,6 +41,9 @@ void Player::parseInput() {
 void Player::control(sf::Keyboard::Key key) {
     sf::Vector2f velocity = getVelocity();
     //Go up
+
+    direction = sf::Vector2f(0, 0);
+
     if (key == sf::Keyboard::W || key == sf::Keyboard::Up) {
         velocity += sf::Vector2f(0, -1 * terminalVelocity);
         direction.y = -1;

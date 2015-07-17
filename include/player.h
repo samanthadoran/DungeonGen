@@ -32,7 +32,6 @@ private:
 
     void control(sf::Keyboard::Key);
 
-    sf::Vector2f direction;
     float terminalVelocity;
 };
 

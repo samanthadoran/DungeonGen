@@ -26,8 +26,8 @@ PlayState::PlayState(Dungeon *dungeon) {
     targetfps = 60;
 
     //Test actors
-    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
-    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
+    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
+    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "monster.png"));
 
     player = dynamic_cast<Player *>(actors.front());
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
@@ -181,8 +181,8 @@ void PlayState::dungeonChange(Game *game) {
     floor = 0;
 
     //Test actors
-    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "link.png"));
-    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "link.png"));
+    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
+    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "monster.png"));
 
     player = dynamic_cast<Player *>(actors.front());
     dynamic_cast<NPC *>(actors.back())->setTarget(player);
