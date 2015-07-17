@@ -30,6 +30,10 @@ public:
 
     vector<Actor *> getItems() const;
 
+    Item *getSelectedItem();
+
+    int getSelectedItemIndex() const;
+
     sf::RectangleShape getHealthBar() const;
 
     string getName() const;
@@ -49,6 +53,8 @@ private:
     void draw(sf::RenderTarget &, sf::RenderStates) const;
     sf::RectangleShape healthBar;
     vector<Actor *> items;
+    Item *selectedItem;
+    int selectedItemIndex;
     string name;
     double damage;
     double hp;

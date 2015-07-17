@@ -39,6 +39,9 @@ Actor::Actor(sf::Vector2f pos, int damage, string filename, string name) : Entit
     this->damage = damage;
     this->name = name;
     hp = 100;
+
+    selectedItem = nullptr;
+    selectedItemIndex = 0;
 }
 
 void Actor::update(sf::Time elapsed) {
@@ -72,7 +75,7 @@ void Actor::update(sf::Time elapsed) {
         i->update(elapsed);
     }
 
-    if (hp < 0)
+    if (hp <= 0)
         kill();
 
     healthBar.setPosition(getPosition() - sf::Vector2f(0, 13));
@@ -110,9 +113,14 @@ double Actor::getDamage() const {
 void Actor::draw(sf::RenderTarget &target, sf::RenderStates states) const {
     target.draw(*animatedSprite, states);
     target.draw(getHealthBar(), states);
+}
 
-    if (!items.empty())
-        target.draw(items[0]->getSprite(), states);
+Item *Actor::getSelectedItem() {
+    return selectedItem;
+}
+
+int Actor::getSelectedItemIndex() const {
+    return selectedItemIndex;
 }
 
 Actor::~Actor() {

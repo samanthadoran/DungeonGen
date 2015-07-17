@@ -5,6 +5,19 @@
 #include "../include/playstate.h"
 #include "../include/menustate.h"
 
+//Fix an annoying bug on MinGW until it is fixed.
+#ifdef _WIN32
+namespace fix {
+    template<typename T>
+    std::string to_string(const T &other) {
+        std::stringstream s;
+        s << other;
+        return s.str();
+    }
+}
+using namespace fix;
+#endif
+
 PlayState::PlayState(Dungeon *dungeon) {
     score = 0;
     d = dungeon;
@@ -288,6 +301,7 @@ void PlayState::render(Game *game) {
     if (debug)
         showText(debugText, debugPos, game);
 
+    drawInventoryOfActor(player, game);
 
     //Update the window
     game->getWindow()->display();
@@ -406,7 +420,27 @@ void PlayState::drawMinimap(Game *game, sf::Texture &f) {
 }
 
 void PlayState::drawInventoryOfActor(Actor *a, Game *game) {
+    sf::Vector2f placePosition = game->getWindow()->getView().getCenter();
+    placePosition -= sf::Vector2f(game->getWindow()->getSize().x / 2.0f, 0);
+    placePosition += sf::Vector2f(0, game->getWindow()->getSize().y / 2.0f - 32);
 
+    for (int i = 0; i < a->getItems().size(); ++i) {
+        //Show the user which item they are using
+        if (i == a->getSelectedItemIndex()) {
+            sf::RectangleShape outline(sf::Vector2f(32, 32));
+            outline.setOutlineThickness(3);
+            outline.setOutlineColor(sf::Color::White);
+            outline.setFillColor(sf::Color::Transparent);
+            outline.setPosition(placePosition + sf::Vector2f(32 * i, 0));
+            game->getWindow()->draw(outline);
+        }
+        sf::Sprite item;
+        item.setTexture(*a->getItems()[i]->getSprite().getTexture());
+        item.setPosition(placePosition + sf::Vector2f(32 * i, 0));
+        game->getWindow()->draw(item);
+
+        showText(to_string(i + 1), placePosition, game);
+    }
 }
 
 //Show supplied text at supplied position
