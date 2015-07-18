@@ -28,11 +28,13 @@ private:
 
     sf::Vector2i worldToTileCoord(sf::Vector2i) const;
 
-    Actor *getTileActors(Tile *);
+    vector<Actor *> getTileActors(Tile *);
 
     void checkActorLife();
 
     void dungeonChange(Game *);
+
+    void pickupItems(Player *, const Tile *);
 
     const Tile *const selectTile(Game *);
 

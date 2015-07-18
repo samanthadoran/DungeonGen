@@ -36,12 +36,47 @@ Actor::Actor(sf::Vector2f pos, int damage, string filename, string name) : Entit
     healthBar.setFillColor(sf::Color::Green);
     healthBar.setOrigin(healthBar.getSize() / 2.0f);
     healthBar.setPosition(getPosition());
+
     this->damage = damage;
     this->name = name;
     hp = 100;
+    points = 1;
 
     selectedItem = nullptr;
     selectedItemIndex = 0;
+}
+
+Actor::Actor(const Actor &other) : Entity(other) {
+    walkingAnimationDown = nullptr;
+    walkingAnimationUp = nullptr;
+    walkingAnimationLeft = nullptr;
+    walkingAnimationRight = nullptr;
+    animatedSprite = nullptr;
+
+    name = other.getName();
+    points = other.getPoints();
+
+    damage = other.getDamage();
+    hp = other.getHP();
+    healthBar = other.getHealthBar();
+
+    selectedItem = nullptr;
+    selectedItemIndex = 0;
+
+    //TODO: Copy Animations
+    //TODO: Push back the same items
+}
+
+int Actor::getPoints() const {
+    return points;
+}
+
+void Actor::addPoints(int other) {
+    points += other;
+}
+
+void Actor::setPoints(int other) {
+    points = other;
 }
 
 void Actor::update(sf::Time elapsed) {
@@ -72,7 +107,6 @@ void Actor::update(sf::Time elapsed) {
 
     for (auto i: items) {
         i->setPosition(getPosition());
-        i->update(elapsed);
     }
 
     if (hp <= 0)
@@ -86,7 +120,13 @@ vector<Actor *> Actor::getItems() const {
 }
 
 void Actor::addItem(Actor *a) {
-    items.push_back(a);
+    if (a->getName() != "money") {
+        items.push_back(a);
+    }
+    else {
+        addPoints(a->getHP());
+        delete a;
+    }
 }
 
 string Actor::getName() const {

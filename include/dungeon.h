@@ -7,8 +7,6 @@
 #include <string>
 #include "map.h"
 
-using namespace std;
-
 class Dungeon {
 public:
     //Create a dungeon
@@ -17,7 +15,7 @@ public:
     Dungeon(int, int);
 
     //Load a dungeon from a file
-    Dungeon(string);
+    Dungeon(std::string);
 
     vector<Map *> getFloors() const;
 
@@ -25,7 +23,7 @@ public:
 
     void addFloor();
 
-    void saveDungeon(string) const;
+    void saveDungeon(std::string) const;
 
     virtual ~Dungeon();
 

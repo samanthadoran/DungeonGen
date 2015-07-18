@@ -14,6 +14,8 @@ class Actor : public Entity, public sf::Drawable {
 public:
     Actor(sf::Vector2f, int, string, string);
 
+    Actor(const Actor &);
+
     virtual void control() = 0;
 
     virtual std::string toString() const = 0;
@@ -42,6 +44,12 @@ public:
 
     sf::Vector2f direction;
 
+    int getPoints() const;
+
+    void setPoints(int);
+
+    void addPoints(int);
+
     virtual ~Actor();
 
 private:
@@ -50,6 +58,7 @@ private:
     Animation * walkingAnimationRight;
     Animation * walkingAnimationUp;
     AnimatedSprite * animatedSprite;
+
     void draw(sf::RenderTarget &, sf::RenderStates) const;
     sf::RectangleShape healthBar;
     vector<Actor *> items;
@@ -58,6 +67,7 @@ private:
     string name;
     double damage;
     double hp;
+    int points;
 };
 
 #endif

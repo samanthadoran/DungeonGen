@@ -13,9 +13,9 @@ Dungeon::Dungeon(int width, int height) {
 }
 
 //Load from file...
-Dungeon::Dungeon(string filename) {
-    ifstream ifp(filename);
-    cout << "Loading..." << endl;
+Dungeon::Dungeon(std::string filename) {
+    std::ifstream ifp(filename);
+    std::cout << "Loading..." << std::endl;
     if (!ifp.is_open())
         return;
 
@@ -33,7 +33,7 @@ Dungeon::Dungeon(string filename) {
     //Iterate over all specified floors
     for (int j = 0; j < numFloors; ++j) {
         floors.push_back(new Map(height, width));
-        string row;
+        std::string row;
 
         //Iterate over the specified rows
         for (int k = 0; k < height; ++k) {
@@ -67,8 +67,8 @@ void Dungeon::addFloor() {
 }
 
 //Save to file...
-void Dungeon::saveDungeon(string filename) const {
-    ofstream ofp(filename);
+void Dungeon::saveDungeon(std::string filename) const {
+    std::ofstream ofp(filename);
 
     if (!ofp.is_open())
         return;
@@ -78,9 +78,9 @@ void Dungeon::saveDungeon(string filename) const {
         return;
 
     //Setup the header
-    ofp << floors[0]->getHeight() << endl;
-    ofp << floors[0]->getWidth() << endl;
-    ofp << floors.size() << endl;
+    ofp << floors[0]->getHeight() << std::endl;
+    ofp << floors[0]->getWidth() << std::endl;
+    ofp << floors.size() << std::endl;
 
     //Quick and easy method to save
     for (auto f: floors)

@@ -15,6 +15,8 @@ public:
 
     Entity(sf::Vector2f, string);
 
+    Entity(const Entity &);
+
     void update(sf::Time);
 
     sf::Vector2f getPosition() const;

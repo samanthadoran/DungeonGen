@@ -54,7 +54,7 @@ void Map::initStairSpawns() {
         }
 }
 
-void Map::addRow(string row) {
+void Map::addRow(std::string row) {
     int x = 0;
     int y = tiles.size();
     vector<Tile *> toAdd;
@@ -69,18 +69,19 @@ void Map::addRow(string row) {
     tiles.push_back(toAdd);
 }
 
-string Map::getTextualRepresentation() const {
-    stringstream s;
+std::string Map::getTextualRepresentation() const {
+    std::stringstream s;
     for (auto row: tiles) {
         for (auto t: row)
             s << t->getTextualRepresentation();
-        s << endl;
+        s << std::endl;
     }
     return s.str();
 }
 
+//Deprecated function to textually print a map
 void Map::render() {
-    cout << getTextualRepresentation();
+    std::cout << getTextualRepresentation();
 }
 
 //Tests whether or not a point lies within the bounds of the map.

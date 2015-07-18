@@ -87,11 +87,23 @@ sf::Vector2f PlayState::collisions(sf::Rect<float> test, sf::Vector2f movement) 
     return movement;
 }
 
+void PlayState::pickupItems(Player *p, const Tile *t) {
+    vector<Actor *> actors = getTileActors((Tile *) t);
+
+    for (auto a: actors)
+        if (dynamic_cast<Item *>(a) != nullptr && a->isAlive())
+            p->addItem(dynamic_cast<Item *>(a)->pickUp());
+}
+
 //TODO: Add more types of tile events.
 void PlayState::runTileEvent(Player *p) {
     const Tile *t = d->getFloor(floor)->getTileAtPos(worldToTileCoord(p->getPosition()));
     TileType type = t->getTileType();
 
+    //When the user crosses over a tile, pickup all items in that tile
+    pickupItems(p, t);
+
+    //HandleNormal tile events
     switch (type) {
         case TileType::STAIRS_UP:
             paused = true;
@@ -163,6 +175,14 @@ void PlayState::handleEvents(Game *game) {
 }
 
 void PlayState::checkActorLife() {
+    //Drop coins for dead actors!
+    for (int i = 0; i < actors.size(); ++i)
+        if (!actors[i]->isAlive() && actors[i]->getPoints() > 0)
+            actors.emplace_back(
+                    new Item(actors[i]->getPosition(), 0, "points.png", "money", actors[i]->getPoints(), 0));
+
+
+    //Actually kill dead actors
     for (auto i = actors.begin(); i != actors.end(); ++i) {
         if (!(*i)->isAlive()) {
             if (i == actors.begin()) {
@@ -173,11 +193,14 @@ void PlayState::checkActorLife() {
                     player = nullptr;
                 }
             }
+
             delete *i;
             *i = nullptr;
             actors.erase(i);
+
             if (actors.empty())
                 break;
+
             i = actors.begin();
         }
     }
@@ -247,9 +270,10 @@ void PlayState::update(Game *game) {
     selectedTile = (Tile *) (selectTile(game));
 
     //Show the user where they are clicking and act on entities within that square
-    if (selectedTile != nullptr)
-        if (getTileActors(selectedTile) != nullptr && player != nullptr)
-            player->act(getTileActors(selectedTile));
+    if (player != nullptr)
+        for (auto a: getTileActors(selectedTile))
+            if (a != nullptr && a->isAlive())
+                player->act(a);
 }
 
 void PlayState::render(Game *game) {
@@ -284,7 +308,8 @@ void PlayState::render(Game *game) {
         drawTileOutline(selectedTile, game);
 
     for (auto a: actors)
-        game->getWindow()->draw(*a);
+        if (a != nullptr && a->isAlive())
+            game->getWindow()->draw(*a);
 
     //Update the debug info every second
     if (textclk.getElapsedTime().asSeconds() >= 1) {
@@ -300,6 +325,9 @@ void PlayState::render(Game *game) {
 
     if (debug)
         showText(debugText, debugPos, game);
+
+    showText("Score: " + to_string(player->getPoints()),
+             debugPos + sf::Vector2f(game->getWindow()->getView().getSize().x / 2.0f, 0), game);
 
     drawInventoryOfActor(player, game);
 
@@ -334,19 +362,18 @@ sf::Vector2i PlayState::worldToTileCoord(sf::Vector2i pos) const {
 
 //Return actors at the given tile
 //TODO: Currently only returns one actor
-Actor *PlayState::getTileActors(Tile *t) {
+vector<Actor *>PlayState::getTileActors(Tile *t) {
+    vector<Actor *> toRet;
     //There isn't a tile here.
     if (t == nullptr)
-        return nullptr;
+        return toRet;
 
-    for (auto a: actors) {
-        sf::Vector2i testPos = worldToTileCoord(a->getPosition());
-        if (t->getPos() == testPos)
-            return a;
-    }
+    for (auto a: actors)
+        if (t->getPos() == worldToTileCoord(a->getPosition()))
+            toRet.push_back(a);
 
     //There's nothing in this tile.
-    return nullptr;
+    return toRet;
 }
 
 //Return a pointer to the tile at the user's mouse
@@ -439,7 +466,7 @@ void PlayState::drawInventoryOfActor(Actor *a, Game *game) {
         item.setPosition(placePosition + sf::Vector2f(32 * i, 0));
         game->getWindow()->draw(item);
 
-        showText(to_string(i + 1), placePosition, game);
+        showText(to_string(i + 1), placePosition + sf::Vector2f(32 * i, 0), game);
     }
 }
 

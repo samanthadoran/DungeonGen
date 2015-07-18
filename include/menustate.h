@@ -7,6 +7,9 @@
 
 #include "state.h"
 #include "playstate.h"
+#include <future>
+#include <thread>
+#include <chrono>
 
 class Game;
 

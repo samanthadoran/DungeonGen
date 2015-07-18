@@ -1,7 +1,6 @@
 #include "../include/game.h"
 #include "../include/state.h"
 #include "../include/menustate.h"
-#include "../include/playstate.h"
 
 using namespace std;
 

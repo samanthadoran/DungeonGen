@@ -1,11 +1,9 @@
 #include "../include/entity.h"
-
 int Entity::nextUUID = -1;
 
 Entity::Entity(sf::Vector2f pos, string filename) {
     alive = true;
-    ++Entity::nextUUID;
-    UUID = Entity::nextUUID;
+    UUID = ++Entity::nextUUID;
     tex.loadFromFile(filename);
     m_sprite.setTexture(tex);
     m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
@@ -19,6 +17,17 @@ Entity::Entity(sf::Vector2f pos, string filename) {
 
     position = pos;
     velocity = sf::Vector2f(0, 0);
+}
+
+Entity::Entity(const Entity &other) {
+    UUID = ++Entity::nextUUID;
+    alive = other.isAlive();
+    tex = other.tex;
+    m_sprite.setTexture(tex);
+    m_sprite.setOrigin(m_sprite.getLocalBounds().width / 2.0f, m_sprite.getLocalBounds().height / 2.0f);
+    position = other.getPosition();
+    velocity = other.getVelocity();
+    collision = other.getCollisionAABB();
 }
 
 sf::RectangleShape Entity::getCollisionAABB() const {

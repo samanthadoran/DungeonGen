@@ -1,8 +1,6 @@
 #ifndef MAP_H
 #define MAP_H
 
-//TODO: Inherit sf::drawable
-
 #include <vector>
 #include <sstream>
 #include <string>
@@ -13,7 +11,6 @@
 #include "tile.h"
 #include "room.h"
 
-using namespace std;
 
 class Map : public sf::Drawable {
 public:
@@ -22,7 +19,7 @@ public:
     Map(int, int);
 
     //For loading a map from a save
-    void addRow(string);
+    void addRow(std::string);
 
     void initStairSpawns();
 
@@ -32,7 +29,7 @@ public:
 
     bool inBounds(sf::Vector2f) const;
 
-    string getTextualRepresentation() const;
+    std::string getTextualRepresentation() const;
 
     int getWidth() const;
 

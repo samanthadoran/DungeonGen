@@ -23,7 +23,6 @@ MenuState::MenuState() {
 }
 
 void MenuState::handleEvents(Game *game) {
-
     //The user has made a selection
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return))
         select(game);
