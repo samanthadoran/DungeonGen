@@ -286,13 +286,18 @@ void PlayState::render(Game *game) {
 
     //Get & Update the camera
     sf::View currView = game->getWindow()->getView();
+    //sf::View currView = game->getWindow()->getDefaultView();
     currView.setCenter(player->getPosition());
-    game->getWindow()->setView(currView);
+    //currView.
+    sf::View zoomed = currView;
+    zoomed.zoom(.25);
+    game->getWindow()->setView(zoomed);
 
 
     //Get the position to place the debug text at
-    sf::Vector2f debugPos(currView.getCenter().x - (currView.getSize().x / 2),
-                          game->getWindow()->getView().getCenter().y - (currView.getSize().y / 2));
+    sf::Vector2f debugPos(zoomed.getCenter().x - (zoomed.getSize().x * 2),
+                          zoomed.getCenter().y - (zoomed.getSize().y * 2));
+
 
 
     //Draw the map to the screen
@@ -323,6 +328,8 @@ void PlayState::render(Game *game) {
     //Experimental minimap stuff
     drawMinimap(game, window);
 
+
+    game->getWindow()->setView(currView);
     if (debug)
         showText(debugText, debugPos, game);
 
@@ -330,9 +337,11 @@ void PlayState::render(Game *game) {
              debugPos + sf::Vector2f(game->getWindow()->getView().getSize().x / 2.0f, 0), game);
 
     drawInventoryOfActor(player, game);
+    game->getWindow()->setView(zoomed);
 
     //Update the window
     game->getWindow()->display();
+    game->getWindow()->setView(currView);
 }
 
 //Utility function to switch coordinate systems
@@ -361,7 +370,7 @@ sf::Vector2i PlayState::worldToTileCoord(sf::Vector2i pos) const {
 }
 
 //Return actors at the given tile
-//TODO: Currently only returns one actor
+//TODO: Make more rigid. A player can be in two tiles at once. account for this.
 vector<Actor *>PlayState::getTileActors(Tile *t) {
     vector<Actor *> toRet;
     //There isn't a tile here.
@@ -380,7 +389,10 @@ vector<Actor *>PlayState::getTileActors(Tile *t) {
 const Tile *const PlayState::selectTile(Game *game) {
     //Is the user trying to select a tile?
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && focus) {
-        sf::Vector2f tilePos = game->getWindow()->mapPixelToCoords(sf::Mouse::getPosition(*game->getWindow()));
+        sf::View zoomedView = game->getWindow()->getView();
+        zoomedView.zoom(.25);
+        sf::Vector2f tilePos = game->getWindow()->mapPixelToCoords(sf::Mouse::getPosition(*game->getWindow()),
+                                                                   zoomedView);
 
         //If the mouse is inbounds on the selected floor, return the tile at its position
         if (d->getFloor(floor)->inBounds(tilePos))
