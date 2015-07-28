@@ -56,9 +56,42 @@ void MenuState::handleEvents(Game *game) {
 
 void MenuState::select(Game *game) {
     Dungeon *d = nullptr;
+    std::future<Dungeon*> f1;
+    
+    //Fancily display that we are generating a new dungeon
+    sf::RectangleShape loading(sf::Vector2f(10,10));
+    sf::Text message("Generating a dungeon. Sorry for the wait!", font);
+    message.setOrigin(message.getLocalBounds().width / 2.0, message.getLocalBounds().height / 2.0);
+    message.setPosition(game->getWindow()->getView().getCenter() + sf::Vector2f(0, 20));
+    loading.setPosition(game->getWindow()->getView().getCenter());
+    loading.setOrigin(5,5);
+    loading.setFillColor(sf::Color::Green);
+    
     switch (selection) {
         case 0:
-            d = new Dungeon(78, 78);
+            //Lambas are useful for me for literally the first time
+            f1 = std::async(std::launch::async, [](){
+                return new Dungeon(78, 78);
+            });
+            
+            while(f1.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+                loading.rotate(1);
+
+                //If the user doesn't want to wait, let them cancel this
+                sf::Event event;
+                while(game->getWindow()->pollEvent(event)) {
+                    if(event.type == sf::Event::Closed) {
+                        game->getWindow()->close();
+                        return;
+                    }
+                }
+
+                game->getWindow()->clear();
+                game->getWindow()->draw(loading);
+                game->getWindow()->draw(message);
+                game->getWindow()->display();
+            }
+            d = f1.get();
             toChange = new PlayState(d);
             game->setDungeon(d);
             break;
