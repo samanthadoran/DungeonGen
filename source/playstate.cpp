@@ -38,16 +38,59 @@ PlayState::PlayState(Dungeon *dungeon) {
     vsync = true;
     targetfps = 60;
 
-    //Test actors
-    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
-    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "monster.png"));
+    player = nullptr;
 
-    player = dynamic_cast<Player *>(actors.front());
-    dynamic_cast<NPC *>(actors.back())->setTarget(player);
-
-    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
-    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
+    changeFloor(0);
 }
+
+void PlayState::cleanupActors() {
+    for (int i = 0; i < actors.size(); ++i) {
+        delete actors[i];
+        actors[i] = nullptr;
+    }
+    actors.clear();
+}
+
+void PlayState::initiateActors() {
+    if (player == nullptr) {
+        actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
+        player = dynamic_cast<Player *>(actors.front());
+        player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
+    }
+    else {
+        actors.push_back(player);
+        player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
+    }
+
+    while (actors.size() < 15) {
+        actors.emplace_back(new NPC(sf::Vector2f(0, 0), "monster.png"));
+        actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
+        dynamic_cast<NPC *>(actors.back())->setTarget(player);
+    }
+
+    //Randomize mob positions
+    for (int i = 1; i < actors.size(); ++i) {
+        sf::Vector2f spawnPos(rand() % (78 * 32), rand() % (78 * 32));
+
+
+        while (d->getFloor(floor)->getTileAtPos(spawnPos)->getTileType() != TileType::FLOOR)
+            spawnPos = sf::Vector2f(rand() % (78 * 32), rand() % (78 * 32));
+
+        actors[i]->setPosition(spawnPos);
+    }
+}
+
+void PlayState::changeFloor(int floor) {
+    this->floor = floor;
+
+    //Don't cleanup the player.
+    if (!actors.empty())
+        actors.front() = nullptr;
+
+    cleanupActors();
+    initiateActors();
+}
+
 
 //Returns a modified vector to obey collision models
 sf::Vector2f PlayState::collisions(sf::Rect<float> test, sf::Vector2f movement) const {
@@ -108,20 +151,18 @@ void PlayState::runTileEvent(Player *p) {
         case TileType::STAIRS_UP:
             paused = true;
             if (floor == 0)
-                //app.close();
                 gameOver = true;
-            else {
-                --floor;
-                p->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsDownSpawn()));
-            }
+            else
+                changeFloor(floor - 1);
+
             break;
         case TileType::STAIRS_DOWN:
             paused = true;
             if (d->getFloors().size() == floor + 1)
                 d->addFloor();
 
-            ++floor;
-            p->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
+            changeFloor(floor + 1);
+
             break;
         default:
             break;
@@ -214,17 +255,8 @@ void PlayState::dungeonChange(Game *game) {
     delete d;
 
     d = game->getDungeon();
-    floor = 0;
 
-    //Test actors
-    actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
-    actors.emplace_back(new NPC(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), "monster.png"));
-
-    player = dynamic_cast<Player *>(actors.front());
-    dynamic_cast<NPC *>(actors.back())->setTarget(player);
-
-    actors.back()->addItem(new Weapon(sf::Vector2f(-1, -1), 1, "sword.png", "sword", -1, 200));
-    player->addItem(new Weapon(sf::Vector2f(-1, -1), 10, "crossbow.png", "crossbow", 500, 200));
+    changeFloor(0);
 
     score = 0;
 }
@@ -503,8 +535,10 @@ string PlayState::updateDebug() {
             (int) ((1000.f / elapsed.asMilliseconds())) << "\nSPF: " << elapsed.asSeconds();
     info << "\nFloor: " << floor + 1;
 
-    if (player != nullptr)
+    if (player != nullptr) {
         info << "\n" << player->toString();
+        info << "\nTileType: " << d->getFloor(floor)->getTileAtPos(player->getPosition())->getTextualRepresentation();
+    }
     else
         info << "\n" << "Player is dead!";
 

@@ -30,6 +30,12 @@ private:
 
     vector<Actor *> getTileActors(Tile *);
 
+    void initiateActors();
+
+    void cleanupActors();
+
+    void changeFloor(int);
+
     void checkActorLife();
 
     void dungeonChange(Game *);

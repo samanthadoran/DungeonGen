@@ -1,5 +1,4 @@
 #include "../include/npc.h"
-
 NPC::NPC(sf::Vector2f pos, string filename) : Actor(pos, 0, filename, "Player") {
     target = nullptr;
     srand(time(0));
