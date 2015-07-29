@@ -17,7 +17,7 @@ public:
     //Load a dungeon from a file
     Dungeon(std::string);
 
-    vector<Map *> getFloors() const;
+    const vector<Map *>& getFloors() const;
 
     Map *getFloor(int) const;
 

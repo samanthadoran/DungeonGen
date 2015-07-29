@@ -18,7 +18,7 @@ namespace fix {
 using namespace fix;
 #endif
 
-PlayState::PlayState(Dungeon *dungeon) {
+PlayState::PlayState(Game * game, Dungeon *dungeon) {
     score = 0;
     d = dungeon;
 
@@ -40,7 +40,7 @@ PlayState::PlayState(Dungeon *dungeon) {
 
     player = nullptr;
 
-    changeFloor(0);
+    changeFloor(game, 0);
 }
 
 void PlayState::cleanupActors() {
@@ -51,7 +51,7 @@ void PlayState::cleanupActors() {
     actors.clear();
 }
 
-void PlayState::initiateActors() {
+void PlayState::initiateActors(int floor) {
     if (player == nullptr) {
         actors.emplace_back(new Player(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()), 240, "player.png"));
         player = dynamic_cast<Player *>(actors.front());
@@ -59,7 +59,10 @@ void PlayState::initiateActors() {
     }
     else {
         actors.push_back(player);
-        player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
+        if(floor > this->floor)
+            player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsUpSpawn()));
+        else
+            player->setPosition(tileToWorldCoord(d->getFloor(floor)->getStairsDownSpawn()));
     }
 
     while (actors.size() < 15) {
@@ -80,15 +83,49 @@ void PlayState::initiateActors() {
     }
 }
 
-void PlayState::changeFloor(int floor) {
-    this->floor = floor;
+void PlayState::changeFloor(Game * game, int floor) {
+    //Fancily display that we are generating a new dungeon
+    sf::RectangleShape loading(sf::Vector2f(10,10));
+    sf::Text message("Adding floors. Sorry for the wait!", font);
+    message.setOrigin(message.getLocalBounds().width / 2.0, message.getLocalBounds().height / 2.0);
+    message.setPosition(game->getWindow()->getView().getCenter() + sf::Vector2f(0, 20));
+    loading.setPosition(game->getWindow()->getView().getCenter());
+    loading.setOrigin(5,5);
+    loading.setFillColor(sf::Color::Green);
+
+    std::future<void> f1 = std::async(std::launch::async, [&]{
+        while(floor > d->getFloors().size() - 1)
+            d->addFloor();
+        return;
+    });
 
     //Don't cleanup the player.
     if (!actors.empty())
         actors.front() = nullptr;
 
     cleanupActors();
-    initiateActors();
+
+    while(f1.wait_for(std::chrono::seconds(0)) != std::future_status::ready) {
+        loading.rotate(1);
+
+        //If the user doesn't want to wait, let them cancel this
+        sf::Event event;
+        while(game->getWindow()->pollEvent(event)) {
+            if(event.type == sf::Event::Closed) {
+                game->getWindow()->close();
+                return;
+            }
+        }
+
+        game->getWindow()->clear();
+        game->getWindow()->draw(loading);
+        game->getWindow()->draw(message);
+        game->getWindow()->display();
+    }
+
+    initiateActors(floor);
+
+    this->floor = floor;
 }
 
 
@@ -139,7 +176,7 @@ void PlayState::pickupItems(Player *p, const Tile *t) {
 }
 
 //TODO: Add more types of tile events.
-void PlayState::runTileEvent(Player *p) {
+void PlayState::runTileEvent(Game * game, Player *p) {
     const Tile *t = d->getFloor(floor)->getTileAtPos(worldToTileCoord(p->getPosition()));
     TileType type = t->getTileType();
 
@@ -153,15 +190,13 @@ void PlayState::runTileEvent(Player *p) {
             if (floor == 0)
                 gameOver = true;
             else
-                changeFloor(floor - 1);
+                changeFloor(game, floor - 1);
 
             break;
         case TileType::STAIRS_DOWN:
             paused = true;
-            if (d->getFloors().size() == floor + 1)
-                d->addFloor();
 
-            changeFloor(floor + 1);
+            changeFloor(game, floor + 1);
 
             break;
         default:
@@ -256,7 +291,7 @@ void PlayState::dungeonChange(Game *game) {
 
     d = game->getDungeon();
 
-    changeFloor(0);
+    changeFloor(game, 0);
 
     score = 0;
 }
@@ -297,7 +332,7 @@ void PlayState::update(Game *game) {
         a->update(elapsed);
     }
 
-    runTileEvent(player);
+    runTileEvent(game, player);
 
     selectedTile = (Tile *) (selectTile(game));
 

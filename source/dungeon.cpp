@@ -51,7 +51,7 @@ Dungeon::Dungeon(std::string filename) {
 }
 
 //Return all of the floors
-vector<Map *> Dungeon::getFloors() const {
+const vector<Map *>& Dungeon::getFloors() const{
     return floors;
 }
 

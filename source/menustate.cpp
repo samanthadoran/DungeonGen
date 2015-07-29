@@ -92,12 +92,12 @@ void MenuState::select(Game *game) {
                 game->getWindow()->display();
             }
             d = f1.get();
-            toChange = new PlayState(d);
+            toChange = new PlayState(game, d);
             game->setDungeon(d);
             break;
         case 1:
             d = new Dungeon("default.txt");
-            toChange = new PlayState(d);
+            toChange = new PlayState(game, d);
             game->setDungeon(d);
             break;
         case 2:

@@ -11,7 +11,7 @@ class Game;
 
 class PlayState : public State {
 public:
-    PlayState(Dungeon *);
+    PlayState(Game *, Dungeon *);
 
     void update(Game *) override;
 
@@ -30,11 +30,11 @@ private:
 
     vector<Actor *> getTileActors(Tile *);
 
-    void initiateActors();
+    void initiateActors(int);
 
     void cleanupActors();
 
-    void changeFloor(int);
+    void changeFloor(Game*, int);
 
     void checkActorLife();
 
@@ -66,7 +66,7 @@ private:
 
     sf::Vector2f collisions(sf::Rect<float>, sf::Vector2f) const;
 
-    void runTileEvent(Player *);
+    void runTileEvent(Game *, Player *);
 
     bool focus;
     bool debug;
