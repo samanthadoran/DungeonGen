@@ -437,7 +437,7 @@ sf::Vector2i PlayState::worldToTileCoord(sf::Vector2i pos) const {
 }
 
 //Return actors at the given tile
-//TODO: Make more rigid. A player can be in two tiles at once. account for this.
+//TODO: Make more rigid. A player can be in two tiles at once, account for this.
 vector<Actor *>PlayState::getTileActors(Tile *t) {
     vector<Actor *> toRet;
     //There isn't a tile here.

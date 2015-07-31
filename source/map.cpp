@@ -1,6 +1,8 @@
 #include "../include/map.h"
 
 Map::Map(int w, int h) {
+    srand(time(0));
+
     height = h;
     width = w;
 

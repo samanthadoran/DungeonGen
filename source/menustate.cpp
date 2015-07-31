@@ -69,7 +69,7 @@ void MenuState::select(Game *game) {
     
     switch (selection) {
         case 0:
-            //Lambas are useful for me for literally the first time
+            //Lambdas are useful for me for literally the first time
             f1 = std::async(std::launch::async, [](){
                 return new Dungeon(78, 78);
             });
