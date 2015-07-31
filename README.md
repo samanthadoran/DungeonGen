@@ -13,5 +13,5 @@ Uses: [this library](https://github.com/SFML/SFML/wiki/Source:-AnimatedSprite) f
 
 <video id="pelican-installation" class="video-js vjs-default-skin" controls
 preload="auto" width="683" height="384" data-setup="{}">
-<source src="http://i.gyazo.com/3d743d14336b85e5eb7f10e65726c097.mp4" type='video/mp4'>
+<source src="http://i.gyazo.com/3d743d14336b85e5eb7f10e65726c097.mp4" poster="https://raw.githubusercontent.com/plu/JPSimulatorHacks/master/Data/test.png" type='video/mp4'>
 </video>
